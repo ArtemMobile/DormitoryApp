@@ -30,9 +30,10 @@ class SplashFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
             ivLogo.animate()
-                .alpha(1f).duration = 1500
+                .alpha(1f)
+                .duration = 1700
             lifecycleScope.launch {
-                delay(1500)
+                delay(2000)
                 findNavController().navigate(R.id.action_splashFragment_to_onboardingFragment)
             }
         }
