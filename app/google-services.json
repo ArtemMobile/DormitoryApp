@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1050483629740",
+    "project_id": "dormitoryimages",
+    "storage_bucket": "dormitoryimages.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050483629740:android:f6165bcded4d733cf4c909",
+        "android_client_info": {
+          "package_name": "com.example.dormitoryapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHtVXnT4lhkTumYlowncsfGEanSx512ro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
