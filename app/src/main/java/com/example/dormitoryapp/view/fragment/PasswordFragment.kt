@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FragmentPasswordBinding
+import com.example.dormitoryapp.utils.PrefsManager
 
 
 class PasswordFragment : Fragment() {
@@ -61,7 +62,6 @@ class PasswordFragment : Fragment() {
         if (password.length < 4) {
             password += (button as AppCompatButton).text
             applyDots()
-            // just to display current password
         }
         if (password.length == 4) {
             savePasswordPassed()
@@ -70,7 +70,7 @@ class PasswordFragment : Fragment() {
     }
 
     private fun savePasswordPassed() {
-
+        PrefsManager(requireContext()).setCreatePasswordPassed()
     }
 
     private fun applyDots() {

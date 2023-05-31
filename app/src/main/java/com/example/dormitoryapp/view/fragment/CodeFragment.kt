@@ -3,25 +3,31 @@ package com.example.dormitoryapp.view.fragment
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FragmentCodeBinding
+import com.example.dormitoryapp.model.dto.SignInModel
 import com.example.dormitoryapp.utils.GenericKeyEvent
 import com.example.dormitoryapp.utils.GenericTextWatcher
+import com.example.dormitoryapp.utils.PrefsManager
+import com.example.dormitoryapp.utils.SignInStatus
+import com.example.dormitoryapp.viewmodel.SignInViewModel
 
 
 class CodeFragment : Fragment() {
 
-
-    private val binding: FragmentCodeBinding by lazy{
+    private val binding: FragmentCodeBinding by lazy {
         FragmentCodeBinding.inflate(layoutInflater)
     }
+
+    private val viewModel: SignInViewModel by viewModels()
 
     private val timer = object : CountDownTimer(60000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
@@ -33,6 +39,7 @@ class CodeFragment : Fragment() {
             this.cancel()
             Toast.makeText(requireContext(), "Код отправлен повторно", Toast.LENGTH_SHORT).show()
             this.start()
+            viewModel.sendCode()
 //            viewModel.sendCode(viewModel.email.value ?: "")
         }
     }
@@ -50,13 +57,37 @@ class CodeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         applyClicks()
         setUpEditors()
+        setObservers()
         timer.start()
     }
 
-    private fun applyClicks(){
-        with(binding){
+    override fun onDestroy() {
+        super.onDestroy()
+        timer.cancel()
+    }
+
+    private fun applyClicks() {
+        with(binding) {
             btnBack.setOnClickListener {
                 findNavController().popBackStack()
+            }
+        }
+    }
+
+    private fun setObservers() {
+        viewModel.signInStatus.observe(viewLifecycleOwner) {
+            val message = viewModel.responseMessage.value?.value?.message
+            when (it) {
+                SignInStatus.SUCCESS -> {
+                    timer.cancel()
+                    viewModel.clearSignInStatus()
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_codeFragment_to_passwordFragment)
+                }
+                SignInStatus.FAIL -> {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+                SignInStatus.NOTHING -> {}
             }
         }
     }
@@ -66,21 +97,21 @@ class CodeFragment : Fragment() {
             etCode1.addTextChangedListener(GenericTextWatcher(etCode1, etCode2))
             etCode2.addTextChangedListener(GenericTextWatcher(etCode2, etCode3))
             etCode3.addTextChangedListener(GenericTextWatcher(etCode3, etCode4))
-            etCode4.addTextChangedListener(GenericTextWatcher(
-                etCode4,
-                null,
-                onLastEditTextFilled = {
-                    etCode4.clearFocus()
-                    sendRequest()
-                    val imm =
-                        requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    view?.let {
-                        imm.hideSoftInputFromWindow(it.windowToken, 0)
+            etCode4.addTextChangedListener(
+                GenericTextWatcher(
+                    etCode4,
+                    null,
+                    onLastEditTextFilled = {
+                        etCode4.clearFocus()
+                        sendRequest()
+                        val imm =
+                            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        view?.let {
+                            imm.hideSoftInputFromWindow(it.windowToken, 0)
+                        }
+                        sendRequest()
                     }
-                    timer.cancel()
-                    findNavController().navigate(R.id.action_codeFragment_to_passwordFragment)
-                }
-            ))
+                ))
 
             etCode1.setOnKeyListener(GenericKeyEvent(etCode1, null))
             etCode2.setOnKeyListener(GenericKeyEvent(etCode2, etCode1))
@@ -92,7 +123,7 @@ class CodeFragment : Fragment() {
     private fun sendRequest() {
         with(binding) {
             val password = "${etCode1.text}${etCode2.text}${etCode3.text}${etCode4.text}"
-//            viewModel.signIn(viewModel.email.value ?: "", password)
+            viewModel.signIn(SignInModel(viewModel.email.value ?: "", password))
         }
     }
 

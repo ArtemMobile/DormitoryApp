@@ -5,6 +5,7 @@
     <string name="skip">Пропустить</string>
     <string name="hello">Добро пожаловать!</string>
     <string name="login_text">Войдите, чтобы пользоваться функциями\nприложения</string>
-    <string name="telegram_nick_hint" formatted="false">@ваш никнейм</string>
+    <string name="telegram_nick_hint" formatted="false">example@mail.ru</string>
     <string name="next">Далее</string>
+    <string name="enter_by_what">Вход через электронную почту</string>
 </resources>

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FragmentOnboardingBinding
+import com.example.dormitoryapp.utils.PrefsManager
 
 class OnboardingFragment : Fragment() {
 
@@ -31,6 +32,7 @@ class OnboardingFragment : Fragment() {
         with(binding){
             tvSkip.setOnClickListener {
                 findNavController().navigate(R.id.action_onboardingFragment_to_loginFragment)
+                PrefsManager(requireContext()).setOnboardingPassed()
             }
         }
     }
