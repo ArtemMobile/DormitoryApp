@@ -67,7 +67,9 @@ class RegisterFragment : Fragment() {
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     viewModel.isLoading.value = false
                     dialog.dismiss()
-                    findNavController().navigate(R.id.action_registerFragment_to_codeFragment)
+                    val bundle = Bundle()
+                    bundle.putBoolean("login", false)
+                    findNavController().navigate(R.id.action_registerFragment_to_codeFragment, bundle)
                     viewModel.clearSendCodeStatus()
                 }
                 SendCodeStatus.FAIL -> {
