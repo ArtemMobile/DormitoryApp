@@ -1,5 +1,6 @@
 package com.example.dormitoryapp.viewmodel
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -16,21 +17,61 @@ import kotlinx.coroutines.withContext
 class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
 
     val createProfileStatus = MutableLiveData<CreateProfileStatus>()
-    val responseMessage = MutableLiveData<ResponseModel>()
+    val updateProfileStatus = MutableLiveData<CreateProfileStatus>()
+    val createProfileResponse = MutableLiveData<ResponseModel>()
+    val updateProfileResponse = MutableLiveData<ResponseModel>()
     val isLoading = MutableLiveData(false)
+    val profile = MutableLiveData<ProfileModel>()
 
+    @SuppressLint("CheckResult")
     fun createProfile(profile: ProfileModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = DormitoryClient.retrofit.createProfile(profile)
-            withContext(Dispatchers.Main) {
-                responseMessage.value = response.body()
-                if (response.isSuccessful) {
-                    createProfileStatus.value = CreateProfileStatus.SUCCESS
-                    PrefsManager(app).saveProfile(profile)
-                } else {
-                    createProfileStatus.value = CreateProfileStatus.FAIL
+            try {
+                val response = DormitoryClient.retrofit.createProfile(profile)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        createProfileStatus.value = CreateProfileStatus.SUCCESS
+                        val body = response.body()!!
+                        PrefsManager(app).saveProfile(body.value)
+                    } else {
+                        val body = response.errorBody()?.string() as ResponseModel
+                        createProfileResponse.value = body
+                        createProfileStatus.value = CreateProfileStatus.FAIL
+                    }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
+    }
+
+    fun getProfile() {
+        profile.value = PrefsManager(app).getProfile()
+    }
+
+    fun updateProfile(profile: ProfileModel, id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = DormitoryClient.retrofit.updateProfile(profile, id)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        updateProfileStatus.value = CreateProfileStatus.SUCCESS
+                        val body = response.body()!!
+                        PrefsManager(app).saveProfile(body.value)
+                    } else {
+                        updateProfileStatus.value = CreateProfileStatus.FAIL
+                        val body = response.errorBody()?.string() as ResponseModel
+                        updateProfileResponse.value = body
+                    }
+                }
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
+    fun clearStatus(){
+        updateProfileStatus.value = CreateProfileStatus.NOTHING
+        createProfileStatus.value = CreateProfileStatus.NOTHING
     }
 }

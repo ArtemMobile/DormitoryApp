@@ -9,5 +9,6 @@ data class ProfileModel(
     val patronymic: String,
     val room: Int,
     val surname: String,
-    val telegramNick: String
+    val telegramNick: String,
+    val id: Int
 )

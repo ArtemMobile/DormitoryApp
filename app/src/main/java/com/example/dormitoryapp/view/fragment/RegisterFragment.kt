@@ -11,20 +11,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.dormitoryapp.R
-import com.example.dormitoryapp.databinding.FragmentLoginBinding
+import com.example.dormitoryapp.databinding.FragmentRegisterBinding
 import com.example.dormitoryapp.model.dto.LoginModel
 import com.example.dormitoryapp.model.dto.Value
 import com.example.dormitoryapp.utils.SendCodeStatus
 import com.example.dormitoryapp.utils.Utils
 import com.example.dormitoryapp.viewmodel.LoginViewModel
 
-class LoginFragment : Fragment() {
+class RegisterFragment : Fragment() {
 
-    private val binding: FragmentLoginBinding by lazy {
-        FragmentLoginBinding.inflate(layoutInflater)
+    private val binding: FragmentRegisterBinding by lazy {
+        FragmentRegisterBinding.inflate(layoutInflater)
     }
 
     private val viewModel: LoginViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,14 +37,17 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         applyClicks()
-        setObservers()
         applyButtonNext()
+        setObservers()
     }
 
     private fun applyClicks() {
         binding.btnNext.setOnClickListener {
             viewModel.sendCode(LoginModel(binding.etTelegramNick.text.toString()))
             viewModel.isLoading.value = true
+        }
+        binding.btnLogin.setOnClickListener{
+            findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
         }
     }
 
@@ -63,9 +67,7 @@ class LoginFragment : Fragment() {
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     viewModel.isLoading.value = false
                     dialog.dismiss()
-                    val bundle = Bundle()
-                    bundle.putBoolean("login", true)
-                    findNavController().navigate(R.id.action_loginFragment_to_codeFragment, bundle)
+                    findNavController().navigate(R.id.action_registerFragment_to_codeFragment)
                     viewModel.clearSendCodeStatus()
                 }
                 SendCodeStatus.FAIL -> {
@@ -98,6 +100,4 @@ class LoginFragment : Fragment() {
             }
         }
     }
-
-
 }

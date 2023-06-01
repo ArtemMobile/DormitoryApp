@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.dormitoryapp.app.DormApp
 import com.example.dormitoryapp.model.api.DormitoryClient
 import com.example.dormitoryapp.model.dto.LoginModel
 import com.example.dormitoryapp.model.dto.ResponseModel
@@ -22,14 +21,20 @@ class LoginViewModel(val app: Application) : AndroidViewModel(app) {
 
     fun sendCode(loginModel: LoginModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = DormitoryClient.retrofit.sendCode(loginModel)
-            withContext(Dispatchers.Main) {
-                responseMessage.value = response.body()
-                if (response.isSuccessful) {
-                    sendCodeStatus.value = SendCodeStatus.SUCCESS
-                    PrefsManager(app).saveEmail(loginModel.emailAddress)
-                } else
-                    sendCodeStatus.value = SendCodeStatus.FAIL
+            try{
+                val response = DormitoryClient.retrofit.sendCode(loginModel)
+                withContext(Dispatchers.Main) {
+                    responseMessage.value = response.body()
+                    if (response.isSuccessful) {
+                        sendCodeStatus.value = SendCodeStatus.SUCCESS
+                        isLoading.value = false
+                        PrefsManager(app).saveEmail(loginModel.emailAddress)
+                    } else
+                        sendCodeStatus.value = SendCodeStatus.FAIL
+                }
+            }
+            catch (e: Exception){
+
             }
         }
     }

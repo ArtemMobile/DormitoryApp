@@ -38,18 +38,15 @@ class SplashFragment : Fragment() {
                 val prefsManager = PrefsManager(requireContext())
                 if (prefsManager.getOnboardingPassed()) {
                     if (prefsManager.getLoginPassed()) {
-                        if (prefsManager.getCreatePasswordPassed()) {
-                            if (prefsManager.getCreateProfilePassed()) {
-
-                            }
-                            else{
-                                findNavController().navigate(R.id.action_splashFragment_to_profileFragment)
-                            }
+                        if (prefsManager.getCreateProfilePassed()) {
+                            findNavController().navigate(R.id.action_splashFragment_to_mainActivity)
+                            requireActivity().finish()
                         } else {
-                            findNavController().navigate(R.id.action_splashFragment_to_passwordFragment)
+                            findNavController().navigate(R.id.action_splashFragment_to_profileFragment)
                         }
+
                     } else {
-                        findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+                        findNavController().navigate(R.id.action_splashFragment_to_registerFragment)
                     }
                 } else {
                     findNavController().navigate(R.id.action_splashFragment_to_onboardingFragment)

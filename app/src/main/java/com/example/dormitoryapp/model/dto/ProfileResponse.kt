@@ -1,8 +1,8 @@
 package com.example.dormitoryapp.model.dto
 
-data class ResponseModel(
+data class ProfileResponse(
     val contentType: Any,
     val serializerSettings: Any,
     val statusCode: Any,
-    var value: Value
+    val value: ProfileModel
 )

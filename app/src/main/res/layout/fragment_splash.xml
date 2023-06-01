@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/accent_bright"
-    tools:context=".view.fragment.SplashFragment">
+    tools:context=".view.fragment.SplaswhFragment">
 
     <ImageView
         android:id="@+id/ivLogo"

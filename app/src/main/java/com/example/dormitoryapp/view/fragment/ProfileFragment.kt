@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FragmentProfileBinding
 import com.example.dormitoryapp.model.dto.ProfileModel
+import com.example.dormitoryapp.model.dto.Value
 import com.example.dormitoryapp.utils.CreateProfileStatus
 import com.example.dormitoryapp.utils.PrefsManager
 import com.example.dormitoryapp.viewmodel.ProfileViewModel
@@ -37,12 +38,17 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clearStatus()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         applyEditors()
         applyClicks()
         setObservers()
-
+        viewModel.getProfile()
     }
 
     private fun setObservers() {
@@ -50,18 +56,35 @@ class ProfileFragment : Fragment() {
         dialog.setCancelable(false)
         dialog.setMessage("Ждём-ждём")
         viewModel.createProfileStatus.observe(viewLifecycleOwner) {
-            val message = viewModel.responseMessage.value?.value?.message
             when (it) {
                 CreateProfileStatus.SUCCESS -> {
+                    Toast.makeText(requireContext(), "Профиль создан", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_profileFragment_to_mainActivity)
+                    requireActivity().finish()
                 }
                 CreateProfileStatus.FAIL -> {
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    val message = (viewModel.createProfileResponse.value?.value) as Value
+                    Toast.makeText(requireContext(), message.message, Toast.LENGTH_SHORT).show()
                 }
                 CreateProfileStatus.NOTHING -> {}
             }
         }
+
+        viewModel.updateProfileStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                CreateProfileStatus.SUCCESS -> {
+                    Toast.makeText(requireContext(), "Профиль обновлён", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                CreateProfileStatus.FAIL -> {
+                    val message = (viewModel.updateProfileResponse.value?.value) as Value
+                    Toast.makeText(requireContext(), message.message, Toast.LENGTH_SHORT).show()
+                }
+                CreateProfileStatus.NOTHING -> {}
+            }
+        }
+
 
         //nahera?
         viewModel.isLoading.observe(viewLifecycleOwner) {
@@ -71,26 +94,59 @@ class ProfileFragment : Fragment() {
                 dialog.dismiss()
             }
         }
+
+        viewModel.profile.observe(viewLifecycleOwner) {
+            setData(it)
+        }
     }
 
+    private fun setData(profile: ProfileModel) {
+        with(binding) {
+            etName.setText(profile.name)
+            etRoom.setText(profile.room.toString())
+            etInterests.setText(profile.interests)
+            etPatronymic.setText(profile.patronymic)
+            etSurname.setText(profile.surname)
+            etContactInfo.setText(profile.contactInfo)
+            etGroupNumber.setText(profile.groupNumber.toString())
+        }
+    }
 
     private fun applyClicks() {
         with(binding) {
             btnSaveProfile.setOnClickListener {
-                viewModel.createProfile(
-                    ProfileModel(
-                        "",
-                        etContactInfo.text.toString(),
-                        etGroupNumber.text.toString().toInt(),
-                        etInterests.text.toString(),
-                        etName.text.toString(),
-                        etPatronymic.text.toString(),
-                        etRoom.text.toString().toInt(),
-                        etSurname.text.toString(),
-                        PrefsManager(requireContext()).getEmail()
+                if (viewModel.profile.value?.id != 0) {
+                    viewModel.updateProfile(
+                        ProfileModel(
+                            "",
+                            etContactInfo.text.toString(),
+                            etGroupNumber.text.toString().toInt(),
+                            etInterests.text.toString(),
+                            etName.text.toString(),
+                            etPatronymic.text.toString(),
+                            etRoom.text.toString().toInt(),
+                            etSurname.text.toString(),
+                            PrefsManager(requireContext()).getEmail(),
+                            viewModel.profile.value!!.id
+                        ), viewModel.profile.value!!.id
                     )
-                )
-                viewModel.isLoading.value = true
+                } else {
+                    viewModel.createProfile(
+                        ProfileModel(
+                            "",
+                            etContactInfo.text.toString(),
+                            etGroupNumber.text.toString().toInt(),
+                            etInterests.text.toString(),
+                            etName.text.toString(),
+                            etPatronymic.text.toString(),
+                            etRoom.text.toString().toInt(),
+                            etSurname.text.toString(),
+                            PrefsManager(requireContext()).getEmail(),
+                            0
+                        )
+                    )
+                    viewModel.isLoading.value = true
+                }
             }
         }
     }
@@ -124,14 +180,16 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+
     }
 
 
     private fun applyEditButton() {
         with(binding) {
-            val fieldsNoEmpty = etName.text.toString().isNotEmpty() && etSurname.text.toString()
+            val fieldsNoEmpty = etSurname.text.toString()
                 .isNotEmpty() && etContactInfo.text.toString()
-                .isNotEmpty() && etRoom.text.toString().isNotEmpty() && etInterests.text.toString()
+                .isNotEmpty() && etRoom.text.toString()
+                .isNotEmpty() && etInterests.text.toString()
                 .isNotEmpty() && etGroupNumber.text.toString().isNotEmpty()
 
             if (fieldsNoEmpty) {

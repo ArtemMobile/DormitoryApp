@@ -45,7 +45,7 @@ class PasswordFragment : Fragment() {
             }
             btnClear.setOnClickListener { clearOneDigit() }
             tvSkip.setOnClickListener {
-                findNavController().navigate(R.id.action_passwordFragment_to_profileFragment)
+                //findNavController().navigate(R.id.action_passwordFragment_to_profileFragment)
                 savePasswordPassed()
             }
         }
@@ -65,7 +65,7 @@ class PasswordFragment : Fragment() {
         }
         if (password.length == 4) {
             savePasswordPassed()
-            findNavController().navigate(R.id.action_passwordFragment_to_profileFragment)
+            //findNavController().navigate(R.id.action_passwordFragment_to_profileFragment)
         }
     }
 

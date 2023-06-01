@@ -76,16 +76,20 @@ class CodeFragment : Fragment() {
 
     private fun setObservers() {
         viewModel.signInStatus.observe(viewLifecycleOwner) {
-            val message = viewModel.responseMessage.value?.value?.message
+            //val message = viewModel.responseMessage.value?.value?.message
             when (it) {
                 SignInStatus.SUCCESS -> {
                     timer.cancel()
                     viewModel.clearSignInStatus()
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_codeFragment_to_passwordFragment)
+                    //Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    if(requireArguments().getBoolean("login")){
+                        findNavController().navigate(R.id.action_codeFragment_to_mainActivity)
+                    } else{
+                        findNavController().navigate(R.id.action_codeFragment_to_profileFragment)
+                    }
                 }
                 SignInStatus.FAIL -> {
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }
                 SignInStatus.NOTHING -> {}
             }
@@ -123,7 +127,11 @@ class CodeFragment : Fragment() {
     private fun sendRequest() {
         with(binding) {
             val password = "${etCode1.text}${etCode2.text}${etCode3.text}${etCode4.text}"
-            viewModel.signIn(SignInModel(viewModel.email.value ?: "", password))
+            if(requireArguments().getBoolean("login")){
+                viewModel.login(SignInModel(viewModel.email.value ?: "", password))
+            } else{
+                viewModel.register(SignInModel(viewModel.email.value ?: "", password))
+            }
         }
     }
 

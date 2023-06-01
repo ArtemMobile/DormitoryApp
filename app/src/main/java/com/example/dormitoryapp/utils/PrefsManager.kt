@@ -28,10 +28,6 @@ class PrefsManager(context: Context) {
         prefs.edit().putBoolean("createPasswordPassed", true).apply()
     }
 
-    fun setCreateProfilePassed() {
-        prefs.edit().putBoolean("createProfilePassed", true).apply()
-    }
-
     fun getOnboardingPassed(): Boolean {
         return prefs.getBoolean("onBoardingPassed", false)
     }
@@ -46,10 +42,14 @@ class PrefsManager(context: Context) {
     }
 
     fun getCreateProfilePassed(): Boolean {
-        return prefs.getBoolean("createProfilePassed", false)
+        return prefs.getString("profile", null) != null
     }
 
     fun saveProfile(profileModel: ProfileModel) {
         prefs.edit().putString("profile", Gson().toJson(profileModel)).apply()
+    }
+
+    fun getProfile(): ProfileModel {
+        return Gson().fromJson(prefs.getString("profile", "{ }"), ProfileModel::class.java)
     }
 }
