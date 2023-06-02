@@ -5,7 +5,7 @@ data class ProfileModel(
     val contactInfo: String,
     val groupNumber: Int,
     val interests: String,
-    val name: String,
+    val firstName: String,
     val patronymic: String,
     val room: Int,
     val surname: String,

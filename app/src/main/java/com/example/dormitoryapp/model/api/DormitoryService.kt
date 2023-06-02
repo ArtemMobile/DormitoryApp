@@ -1,29 +1,48 @@
 package com.example.dormitoryapp.model.api
 
 import com.example.dormitoryapp.model.dto.*
+import io.reactivex.rxjava3.core.Observable
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface DormitoryService {
 
-    @POST("authorization")
+    @POST("Authorization")
     suspend fun sendCode(@Body loginModel: LoginModel): Response<ResponseModel>
 
-    @POST("authorization/login")
+    @POST("Authorization/login")
     suspend fun signIn(@Body signInModel: SignInModel): Response<ProfileResponse>
 
-    @POST("authorization/register")
+    @POST("Authorization/register")
     suspend fun register(@Body signInModel: SignInModel): Response<ResponseModel>
 
-    @POST("profile")
+    @POST("Profile")
     suspend fun createProfile(@Body profileModel: ProfileModel): Response<ProfileResponse>
 
-    @PUT("profile")
+    @PUT("Profile")
     suspend fun updateProfile(
         @Body profileModel: ProfileModel,
         @Query("id") id: Int
     ): Response<ProfileResponse>
+
+    @GET("Post")
+    suspend fun getPostsData(): Response<List<PostModel>>
+
+    @GET("Post/byType")
+    suspend fun getPostsByType(@Query("idType") idType: Int): Response<List<PostModel>>
+
+    @GET("Profile/{id}")
+    suspend fun getProfileById(@Path("id") id: Int): Response<ProfileModel>
+
+    @GET("PostType")
+    suspend fun getPostTypes(): Response<List<PostTypeModel>>
+
+    @GET("post")
+    fun getPosts(): Observable<MutableList<PostModel>>
+
+    @GET("post/{idPost}")
+    fun getPostType(@Path("idPost", encoded = false) idPost: Int): Observable<PostTypeModel>
+
+    @GET("poststypes")
+    fun getCommentsOfPost(@Path("id", encoded = false) id: Int): Observable<List<PostTypeModel>>
 }

@@ -13,4 +13,5 @@
     <color name="editor_stroke">#EBEBEB</color>
     <color name="inactive_button">#C9D4FB</color>
     <color name="grey_bottom_nav_item">#B8C1CC</color>
+    <color name="gold">#FFEB3B</color>
 </resources>

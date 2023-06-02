@@ -1,60 +1,172 @@
 package com.example.dormitoryapp.view.fragment
 
+import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.view.isEmpty
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dormitoryapp.R
+import com.example.dormitoryapp.databinding.FilterChipBinding
+import com.example.dormitoryapp.databinding.FragmentHomeBinding
+import com.example.dormitoryapp.databinding.PostBottomSheetBinding
+import com.example.dormitoryapp.model.dto.PostModel
+import com.example.dormitoryapp.model.dto.PostTypeModel
+import com.example.dormitoryapp.view.adapter.PostAdapter
+import com.example.dormitoryapp.viewmodel.PostTypeViewModel
+import com.example.dormitoryapp.viewmodel.PostViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    private val binding: FragmentHomeBinding by lazy {
+        FragmentHomeBinding.inflate(layoutInflater)
     }
 
+    private val postTypeViewModel: PostTypeViewModel by viewModels()
+    private val viewModel: PostViewModel by viewModels()
+    private lateinit var postAdapter: PostAdapter
+    private lateinit var typesList: List<PostTypeModel>
+    private var bottomSheetDialogBinding: PostBottomSheetBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.getPosts()
+        postTypeViewModel.getPostTypes()
+        setObservers()
+        setUpAdapter()
+        initSwipeRefreshLayout()
+        applyChips()
+    }
+
+    private fun setObservers() {
+        viewModel.posts.observe(viewLifecycleOwner) {
+            postAdapter.updatePosts(it)
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
+
+        postTypeViewModel.types.observe(viewLifecycleOwner) { types ->
+            if(binding.chipGroup.isEmpty()){
+                types.forEachIndexed { index, category ->
+                    val chip =
+                        FilterChipBinding.inflate(layoutInflater).rootChip.apply {
+                            text = category.name
+                        }
+                    binding.chipGroup.addView(chip.apply {
+                        id = category.id
+                    })
                 }
             }
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner){
+            binding.root.isRefreshing = it
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showBottomSheetDialog(postModel: PostModel) {
+        val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.AppBottomSheet)
+        bottomSheetDialogBinding = PostBottomSheetBinding.inflate(layoutInflater)
+        bottomSheetDialog.setContentView(bottomSheetDialogBinding!!.root)
+        with(bottomSheetDialogBinding!!) {
+            tvTitle.text = postModel.title
+            tvDescription.text = postModel.description
+            tvType.text = postModel.name
+            tvPublishDate.text = "Опубликовано: ${
+                DateTimeFormatter.ofPattern("dd.MM.yyy hh:mm")
+                    .format(LocalDateTime.parse(postModel.publishDate))
+            }"
+            tvTitle.text = postModel.title
+            tvAuthor.text = "${postModel.firstName} ${postModel.surname} "
+            tvAuthor.setOnClickListener {
+                bottomSheetDialog.dismiss()
+                val bundle = Bundle()
+                bundle.putInt("idProfile", postModel.idProfile)
+                findNavController().navigate(R.id.action_homeFragment_to_userFragment, bundle)
+            }
+
+            if (postModel.notificationDate != null) {
+                tvNotificationDate.text = "Уведомление придёт: ${
+                    DateTimeFormatter.ofPattern("dd.MM.yyy hh:mm")
+                        .format(LocalDateTime.parse(postModel.notificationDate as String))
+                }"
+            } else {
+                btnSubscribe.visibility = View.GONE
+                tvNotificationDate.visibility = View.GONE
+            }
+
+            if (postModel.isPayable) {
+                cardViewPayable.visibility = View.VISIBLE
+            } else {
+                cardViewPayable.visibility = View.GONE
+            }
+
+            ivClose.setOnClickListener {
+                bottomSheetDialog.dismiss()
+            }
+
+            btnSubscribe.setOnClickListener {
+
+            }
+        }
+        bottomSheetDialog.show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setUpAdapter() {
+        postAdapter =
+            PostAdapter(requireContext(), mutableListOf(), onClick = { showBottomSheetDialog(it) })
+        with(binding.rvPosts) {
+            adapter = postAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun initSwipeRefreshLayout() {
+        binding.root.setOnRefreshListener {
+            lifecycleScope.launch {
+                delay(1000)
+                viewModel.getPosts()
+                binding.root.isRefreshing = false
+            }
+        }
+    }
+
+    private fun applyChips(){
+        with(binding.chipGroup){
+            setOnCheckedStateChangeListener { _, checkedIds ->
+                if(checkedIds.isNotEmpty()){
+                    val idType = checkedIds[0]
+                    viewModel.getPostByType(idType)
+                } else{
+                    viewModel.isLoading.value = true
+                    viewModel.getPosts()
+                }
+            }
+        }
     }
 }

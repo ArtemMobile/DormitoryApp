@@ -102,7 +102,7 @@ class ProfileFragment : Fragment() {
 
     private fun setData(profile: ProfileModel) {
         with(binding) {
-            etName.setText(profile.name)
+            etName.setText(profile.firstName)
             etRoom.setText(profile.room.toString())
             etInterests.setText(profile.interests)
             etPatronymic.setText(profile.patronymic)

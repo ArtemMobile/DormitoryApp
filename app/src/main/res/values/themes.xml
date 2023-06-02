@@ -22,4 +22,32 @@
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>
     </style>
+
+    <style name="AppModalStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="AppBottomSheet" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="chipText" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/sf_pro_med</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="DefaultChipStyle" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/chip_text_color_state</item>
+        <item name="chipBackgroundColor">@color/chip_background_state</item>
+        <item name="chipCornerRadius">10dp</item>
+        <item name="rippleColor">@null</item>
+        <item name="android:paddingVertical" tools:ignore="NewApi">14dp</item>
+        <item name="chipMinTouchTargetSize">0dp</item>
+        <item name="textStartPadding">15dp</item>
+        <item name="textEndPadding">15dp</item>
+    </style>
+
 </resources>

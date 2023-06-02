@@ -22,6 +22,7 @@ class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
     val updateProfileResponse = MutableLiveData<ResponseModel>()
     val isLoading = MutableLiveData(false)
     val profile = MutableLiveData<ProfileModel>()
+    val profileById = MutableLiveData<ProfileModel>()
 
     @SuppressLint("CheckResult")
     fun createProfile(profile: ProfileModel) {
@@ -70,8 +71,26 @@ class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun clearStatus(){
+    fun clearStatus() {
         updateProfileStatus.value = CreateProfileStatus.NOTHING
         createProfileStatus.value = CreateProfileStatus.NOTHING
+    }
+
+    fun getProfileById(idProfile: Int) {
+        try {
+            viewModelScope.launch {
+                val response = DormitoryClient.retrofit.getProfileById(idProfile)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        profileById.value = response.body()
+                    } else {
+
+                    }
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
     }
 }
