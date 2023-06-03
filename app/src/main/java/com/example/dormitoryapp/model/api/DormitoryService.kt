@@ -2,6 +2,7 @@ package com.example.dormitoryapp.model.api
 
 import com.example.dormitoryapp.model.dto.*
 import io.reactivex.rxjava3.core.Observable
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -26,16 +27,25 @@ interface DormitoryService {
     ): Response<ProfileResponse>
 
     @GET("Post")
-    suspend fun getPostsData(): Response<List<PostModel>>
+    suspend fun getPostsData( @Header("Connection") connection: String = "close"): Response<List<PostModel>>
 
     @GET("Post/byType")
-    suspend fun getPostsByType(@Query("idType") idType: Int): Response<List<PostModel>>
+    suspend fun getPostsByType(
+        @Query("idType") idType: Int,
+        @Header("Connection") connection: String = "close"
+    ): Response<List<PostModel>>
 
     @GET("Profile/{id}")
     suspend fun getProfileById(@Path("id") id: Int): Response<ProfileModel>
 
     @GET("PostType")
     suspend fun getPostTypes(): Response<List<PostTypeModel>>
+
+    @GET("Profile")
+    suspend fun getAllUsers(): Response<List<ProfileModel>>
+
+    @POST("Feedback")
+    suspend fun sendFeedback(@Body feedbackModel: FeedbackModel): Response<ResponseModel>
 
     @GET("post")
     fun getPosts(): Observable<MutableList<PostModel>>

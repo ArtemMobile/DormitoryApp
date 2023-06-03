@@ -74,8 +74,9 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPay"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:backgroundTint="@color/gold"
                     app:cardCornerRadius="30dp"
                     app:layout_constraintBottom_toTopOf="@+id/textView3"
@@ -93,17 +94,6 @@
                         android:text="₽"
                         android:textColor="@color/white" />
                 </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_reg"
-                    android:textColor="@color/black"
-                    android:text="Автор готов заплатить"
-                    android:textSize="10sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

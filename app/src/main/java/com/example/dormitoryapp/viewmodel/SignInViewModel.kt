@@ -68,7 +68,7 @@ class SignInViewModel(val app: Application) : AndroidViewModel(app) {
                     responseMessage.value = response.body()
                 }
             } catch (e: java.lang.Exception) {
-
+                e.printStackTrace()
             }
         }
     }

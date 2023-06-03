@@ -21,7 +21,6 @@ import com.example.dormitoryapp.utils.CreateProfileStatus
 import com.example.dormitoryapp.utils.PrefsManager
 import com.example.dormitoryapp.viewmodel.ProfileViewModel
 
-
 class ProfileFragment : Fragment() {
 
     private val binding: FragmentProfileBinding by lazy {
@@ -48,7 +47,7 @@ class ProfileFragment : Fragment() {
         applyEditors()
         applyClicks()
         setObservers()
-        viewModel.getProfile()
+        viewModel.getProfileId()
     }
 
     private fun setObservers() {
@@ -97,6 +96,10 @@ class ProfileFragment : Fragment() {
 
         viewModel.profile.observe(viewLifecycleOwner) {
             setData(it)
+        }
+
+        viewModel.profileId.observe(viewLifecycleOwner){
+            viewModel.getProfileById(it)
         }
     }
 
@@ -180,9 +183,7 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
-
     }
-
 
     private fun applyEditButton() {
         with(binding) {

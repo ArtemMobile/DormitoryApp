@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.isEmpty
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +25,6 @@ import com.example.dormitoryapp.view.adapter.PostAdapter
 import com.example.dormitoryapp.viewmodel.PostTypeViewModel
 import com.example.dormitoryapp.viewmodel.PostViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -57,6 +57,7 @@ class HomeFragment : Fragment() {
         setUpAdapter()
         initSwipeRefreshLayout()
         applyChips()
+        initScroll()
     }
 
     private fun setObservers() {
@@ -129,6 +130,10 @@ class HomeFragment : Fragment() {
                 bottomSheetDialog.dismiss()
             }
 
+            cardPay.setOnClickListener {
+                Toast.makeText(requireContext(), "Автор записи...", Toast.LENGTH_SHORT).show()
+            }
+
             btnSubscribe.setOnClickListener {
 
             }
@@ -149,10 +154,21 @@ class HomeFragment : Fragment() {
     private fun initSwipeRefreshLayout() {
         binding.root.setOnRefreshListener {
             lifecycleScope.launch {
-                delay(1000)
                 viewModel.getPosts()
-                binding.root.isRefreshing = false
             }
+        }
+    }
+
+    private fun initScroll(){
+        with(binding.nestedScrollView){
+            setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                var difference = (scrollY - oldScrollY)
+                if(difference>0){
+                    binding.fab.hide()
+                } else{
+                    binding.fab.show()
+                }
+            })
         }
     }
 

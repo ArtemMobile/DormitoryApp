@@ -27,7 +27,6 @@
         <activity
             android:name=".view.activity.MainActivity"
             android:exported="true">
-
         </activity>
     </application>
 

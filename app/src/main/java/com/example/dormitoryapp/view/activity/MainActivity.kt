@@ -1,7 +1,6 @@
 package com.example.dormitoryapp.view.activity
 
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -23,18 +22,23 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, des, _ ->
-            when(des.id){
+            when (des.id) {
                 R.id.userFragment -> hideBottomNav()
                 else -> showBottomNav()
             }
         }
     }
 
-    private fun hideBottomNav(){
-        binding.bottomNavigationView.visibility = View.GONE
+    fun hideBottomNav() {
+        binding.bottomNavigationView.clearAnimation()
+        binding.bottomNavigationView.animate().translationY(
+            binding.bottomNavigationView.getHeight()
+                .toFloat()
+        ).duration = 300;
     }
 
-    private fun showBottomNav(){
-        binding.bottomNavigationView.visibility = View.VISIBLE
+    fun showBottomNav() {
+        binding.bottomNavigationView.clearAnimation();
+        binding.bottomNavigationView.animate().translationY(0F).duration = 300;
     }
 }

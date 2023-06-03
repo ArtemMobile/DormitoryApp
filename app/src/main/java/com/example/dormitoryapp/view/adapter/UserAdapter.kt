@@ -8,7 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dormitoryapp.databinding.UserCardBinding
 import com.example.dormitoryapp.model.dto.ProfileModel
 
-class UserAdapter(val context: Context, var users: List<ProfileModel>) :
+class UserAdapter(
+    val context: Context,
+    var users: List<ProfileModel>,
+    val onClick: (ProfileModel) -> Unit = {}
+) :
     RecyclerView.Adapter<UserAdapter.UserHolder>() {
     class UserHolder(val binding: UserCardBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -16,11 +20,16 @@ class UserAdapter(val context: Context, var users: List<ProfileModel>) :
         return UserHolder(UserCardBinding.inflate(LayoutInflater.from(context), parent, false))
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: UserHolder, position: Int) {
         val user = users[position]
         with(holder.binding) {
             tvName.text = "${user.firstName} ${user.surname}"
-            tvRoom.text = user.room.toString()
+            tvRoom.text = "${user.room} комната"
+
+            root.setOnClickListener {
+                onClick(user)
+            }
         }
     }
 

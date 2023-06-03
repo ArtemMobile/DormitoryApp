@@ -2,6 +2,7 @@ package com.example.dormitoryapp.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -23,6 +24,8 @@ class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
     val isLoading = MutableLiveData(false)
     val profile = MutableLiveData<ProfileModel>()
     val profileById = MutableLiveData<ProfileModel>()
+    val profileId = MutableLiveData<Int>()
+    val users = MutableLiveData<List<ProfileModel>>()
 
     @SuppressLint("CheckResult")
     fun createProfile(profile: ProfileModel) {
@@ -46,8 +49,8 @@ class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun getProfile() {
-        profile.value = PrefsManager(app).getProfile()
+    fun getProfileId() {
+        profileId.value = PrefsManager(app).getProfile().id
     }
 
     fun updateProfile(profile: ProfileModel, id: Int) {
@@ -77,20 +80,42 @@ class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
     }
 
     fun getProfileById(idProfile: Int) {
-        try {
-            viewModelScope.launch {
+
+        viewModelScope.launch {
+            try {
                 val response = DormitoryClient.retrofit.getProfileById(idProfile)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         profileById.value = response.body()
+                        profile.value = response.body()
                     } else {
-
+                        profile.value = PrefsManager(app).getProfile()
                     }
                 }
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                profile.postValue(PrefsManager(app).getProfile())
             }
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
         }
 
+    }
+
+    fun getAllUsers() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = DormitoryClient.retrofit.getAllUsers()
+                isLoading.postValue(true)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        users.value = response.body()
+                        isLoading.value = false
+                    } else {
+                        Log.d("no users", response.errorBody()?.string().toString())
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }
