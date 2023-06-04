@@ -50,6 +50,27 @@ interface DormitoryService {
     @POST("Post")
     suspend fun createPost(@Body createPostModel: CreatePostModel): Response<ResponseModel>
 
+    @GET("PostSubscription/{idProfile}")
+    suspend fun getPostSubscriptionsByProfile(@Path("idProfile") idProfile: Int) : Response<List<PostSubscriptionModel>>
+
+    @POST("PostSubscription")
+    suspend fun addPostSubscription(@Body createPostSubscriptionModel: CreatePostSubscriptionModel) : Response<ResponseModel>
+
+    @HTTP(method = "DELETE", path = "PostSubscription", hasBody = true)
+    suspend fun deletePostSubscription(@Body createPostSubscriptionModel: CreatePostSubscriptionModel) : Response<ResponseModel>
+
+
+    @GET("ProfileSubscription/{idProfile}")
+    suspend fun getProfileSubscriptionsByProfile(@Path("idProfile") idProfile: Int) : Response<List<ProfileSubscriptionModel>>
+
+    @POST("ProfileSubscription")
+    suspend fun addProfileSubscription(@Body createProfeltSubscriptionModel: CreateProfileSubscriptionModel) : Response<ResponseModel>
+
+    @HTTP(method = "DELETE", path = "ProfileSubscription", hasBody = true)
+    suspend fun deleteProfileSubscription(@Body createPostSubscriptionModel: CreateProfileSubscriptionModel) : Response<ResponseModel>
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     @GET("post")
     fun getPosts(): Observable<MutableList<PostModel>>
 

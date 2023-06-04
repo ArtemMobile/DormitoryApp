@@ -151,7 +151,7 @@
                 android:buttonTint="@color/gold"
                 android:layout_marginTop="12dp"
                 android:layout_height="wrap_content"
-                android:text="Поставьте галочку, если " />
+                android:text="Поставьте галочку, если запись касается купли-продажи или вы готовы" />
 
         </LinearLayout>
 

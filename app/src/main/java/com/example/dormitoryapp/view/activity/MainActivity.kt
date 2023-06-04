@@ -1,11 +1,13 @@
 package com.example.dormitoryapp.view.activity
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.ActivityMainBinding
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +29,7 @@ class MainActivity : AppCompatActivity() {
                 else -> showBottomNav()
             }
         }
+        Snackbar.make(binding.root, "agenda will be here", Snackbar.LENGTH_SHORT).show()
     }
 
     fun hideBottomNav() {

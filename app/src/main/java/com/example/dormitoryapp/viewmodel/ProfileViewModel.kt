@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.dormitoryapp.app.DormApp
 import com.example.dormitoryapp.model.api.DormitoryClient
 import com.example.dormitoryapp.model.dto.ProfileModel
 import com.example.dormitoryapp.model.dto.ResponseModel
@@ -80,7 +81,6 @@ class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
     }
 
     fun getProfileById(idProfile: Int) {
-
         viewModelScope.launch {
             try {
                 val response = DormitoryClient.retrofit.getProfileById(idProfile)
@@ -95,6 +95,25 @@ class ProfileViewModel(val app: Application) : AndroidViewModel(app) {
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
                 profile.postValue(PrefsManager(app).getProfile())
+            }
+        }
+
+    }
+
+    fun getUserById(idProfile: Int) {
+        viewModelScope.launch {
+            try {
+                val response = DormitoryClient.retrofit.getProfileById(idProfile)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        profileById.value = response.body()
+                        profile.value = response.body()
+                    } else {
+
+                    }
+                }
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
             }
         }
 

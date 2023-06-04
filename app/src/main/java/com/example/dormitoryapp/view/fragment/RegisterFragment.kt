@@ -61,10 +61,8 @@ class RegisterFragment : Fragment() {
         dialog.setCancelable(false)
         dialog.setMessage("Ждём-ждём")
         viewModel.sendCodeStatus.observe(viewLifecycleOwner) {
-            val message = (viewModel.responseMessage.value?.value as Value).message
             when (it) {
                 SendCodeStatus.SUCCESS -> {
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     viewModel.isLoading.value = false
                     dialog.dismiss()
                     val bundle = Bundle()
@@ -73,7 +71,7 @@ class RegisterFragment : Fragment() {
                     viewModel.clearSendCodeStatus()
                 }
                 SendCodeStatus.FAIL -> {
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+
                 }
                 SendCodeStatus.NOTHING -> {}
             }

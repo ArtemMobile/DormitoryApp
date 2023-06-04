@@ -69,6 +69,7 @@ class PostViewModel : ViewModel() {
                     if (response.isSuccessful) {
                         createPostResponse.value = response.body()
                         createPostStatus.value = CreatePostStatus.SUCCESS
+                        Log.d("cretatedPost", createPostModel.toString())
                         isLoading.value = false
                     } else {
                         createPostStatus.value = CreatePostStatus.FAILURE

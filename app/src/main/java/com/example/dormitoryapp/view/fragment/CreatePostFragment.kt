@@ -30,6 +30,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -122,14 +123,13 @@ class CreatePostFragment : Fragment() {
             }
 
             btnCreatePost.setOnClickListener {
+                val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
                 val notificationDateTime = LocalDateTime.ofInstant(
                     notificationCalendar.toInstant(),
                     notificationCalendar.timeZone.toZoneId()
                 ).toLocalDate()
-                val expireDateTime = LocalDateTime.ofInstant(
-                    notificationCalendar.toInstant(),
-                    notificationCalendar.timeZone.toZoneId()
-                ).toLocalDate()
+                val expireDate =
+                    LocalDateTime.parse(binding.etExpireDate.text.toString(), formatter)
                 if (datesAreValid()) {
                     viewModel.createPost(
                         CreatePostModel(
@@ -139,7 +139,7 @@ class CreatePostFragment : Fragment() {
                             PrefsManager(requireContext()).getProfile().id,
                             notificationDateTime.toString(),
                             cbPayable.isChecked,
-                            expireDateTime.toString()
+                            expireDate.toString()
                         )
                     )
                 } else {
@@ -240,7 +240,6 @@ class CreatePostFragment : Fragment() {
                 }
             }
         }
-
     }
 
     private fun applyEditButton() {
@@ -248,7 +247,7 @@ class CreatePostFragment : Fragment() {
             val fieldsNoEmpty = etTitle.text.toString()
                 .isNotEmpty() && etDescription.text.toString()
                 .isNotEmpty() && etExpireDate.text.toString()
-                .isNotEmpty()
+                .isNotEmpty() && chipGroup.checkedChipIds.size != 0
 
             if (fieldsNoEmpty) {
                 btnCreatePost.isEnabled = true
@@ -275,8 +274,8 @@ class CreatePostFragment : Fragment() {
             arguments?.getString("types", "[ ]"),
             object : TypeToken<List<PostTypeModel>>() {}.type
         ) as? List<PostTypeModel>
-        if (binding.chipGroup.isEmpty()) {
-            types?.forEachIndexed { index, category ->
+        if (binding.chipGroup.isEmpty() && types?.size != 0) {
+            types?.forEachIndexed { _, category ->
                 val chip =
                     FilterChipBinding.inflate(layoutInflater).rootChip.apply {
                         text = category.name
@@ -285,6 +284,7 @@ class CreatePostFragment : Fragment() {
                     id = category.id
                 })
             }
+            binding.chipGroup.check(binding.chipGroup.getChildAt(0).id)
         }
     }
 }

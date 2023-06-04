@@ -130,8 +130,8 @@ class ProfileFragment : Fragment() {
                             etRoom.text.toString().toInt(),
                             etSurname.text.toString(),
                             PrefsManager(requireContext()).getEmail(),
-                            viewModel.profile.value!!.id
-                        ), viewModel.profile.value!!.id
+                            viewModel.profileId.value!!
+                        ), viewModel.profileId.value!!
                     )
                 } else {
                     viewModel.createProfile(

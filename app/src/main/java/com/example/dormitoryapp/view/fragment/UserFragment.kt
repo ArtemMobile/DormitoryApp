@@ -12,15 +12,19 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.dormitoryapp.databinding.FragmentUserBinding
 import com.example.dormitoryapp.model.dto.ProfileModel
+import com.example.dormitoryapp.viewmodel.ProfileSubscriptionViewModel
 import com.example.dormitoryapp.viewmodel.ProfileViewModel
 
 class UserFragment : Fragment() {
 
     private val profileViewModel: ProfileViewModel by viewModels()
+    private val profileSubscriptionViewModel: ProfileSubscriptionViewModel by viewModels()
 
     private val binding: FragmentUserBinding by lazy{
         FragmentUserBinding.inflate(layoutInflater)
     }
+
+    private var user : ProfileModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,21 +37,41 @@ class UserFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        profileViewModel.getProfileById(requireArguments().getInt("idProfile"))
-        val user = arguments?.getSerializable("profile") as? ProfileModel
+        user = arguments?.getSerializable("profile") as? ProfileModel
         user?.let {
             setData(it)
         }
         setObServers()
         applyClicks()
+        profileSubscriptionViewModel.getProfileSubscriptions()
     }
 
     private fun setObServers() {
-        profileViewModel.profileById.observe(viewLifecycleOwner) {
-            it?.let {
-                setData(it)
+        profileSubscriptionViewModel.profileSubscriptionOfUser.observe(viewLifecycleOwner){
+            var profileSubscriptionsOfUser = it
+            binding.btnFollow.apply {
+                if(profileSubscriptionsOfUser.contains(profileSubscriptionsOfUser.firstOrNull { u -> u.idProfile == user?.id })){
+                    text = "Отписаться от уведомлений"
+                    setOnClickListener {
+                        user?.id?.let { it1 ->
+                            profileSubscriptionViewModel.deleteProfileSubscription(
+                                it1
+                            )
+                        }
+                    }
+                } else{
+                    text = "Подписаться на уведомления"
+                    setOnClickListener {
+                        user?.id?.let { it1 ->
+                            profileSubscriptionViewModel.addProfileSubscription(
+                                it1
+                            )
+                        }
+                    }
+                }
             }
         }
+
     }
 
     private fun applyClicks() {
