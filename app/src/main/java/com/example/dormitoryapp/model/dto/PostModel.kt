@@ -7,7 +7,7 @@ data class PostModel(
     val idType: Int,
     val isPayable: Boolean,
     var name: String,
-    val notificationDate: Any,
+    val notificationDate: String,
     val publishDate: String,
     val title: String,
     val firstName: String,

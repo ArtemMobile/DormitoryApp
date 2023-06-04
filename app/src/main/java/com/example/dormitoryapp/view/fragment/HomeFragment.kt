@@ -25,6 +25,7 @@ import com.example.dormitoryapp.view.adapter.PostAdapter
 import com.example.dormitoryapp.viewmodel.PostTypeViewModel
 import com.example.dormitoryapp.viewmodel.PostViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -58,6 +59,15 @@ class HomeFragment : Fragment() {
         initSwipeRefreshLayout()
         applyChips()
         initScroll()
+        applyClicks()
+    }
+
+    private fun applyClicks() {
+        binding.fab.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString("types", Gson().toJson(typesList))
+            findNavController().navigate(R.id.action_homeFragment_to_createPostFragment, bundle)
+        }
     }
 
     private fun setObservers() {
@@ -70,6 +80,7 @@ class HomeFragment : Fragment() {
         }
 
         postTypeViewModel.types.observe(viewLifecycleOwner) { types ->
+            typesList = types
             if(binding.chipGroup.isEmpty()){
                 types.forEachIndexed { index, category ->
                     val chip =
@@ -110,10 +121,10 @@ class HomeFragment : Fragment() {
                 findNavController().navigate(R.id.action_homeFragment_to_userFragment, bundle)
             }
 
-            if (postModel.notificationDate != null) {
+            if (postModel.notificationDate.isNotEmpty()) {
                 tvNotificationDate.text = "Уведомление придёт: ${
                     DateTimeFormatter.ofPattern("dd.MM.yyy hh:mm")
-                        .format(LocalDateTime.parse(postModel.notificationDate as String))
+                        .format(LocalDateTime.parse(postModel.notificationDate))
                 }"
             } else {
                 btnSubscribe.visibility = View.GONE

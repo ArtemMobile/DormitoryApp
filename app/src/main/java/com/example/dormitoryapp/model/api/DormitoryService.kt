@@ -47,6 +47,9 @@ interface DormitoryService {
     @POST("Feedback")
     suspend fun sendFeedback(@Body feedbackModel: FeedbackModel): Response<ResponseModel>
 
+    @POST("Post")
+    suspend fun createPost(@Body createPostModel: CreatePostModel): Response<ResponseModel>
+
     @GET("post")
     fun getPosts(): Observable<MutableList<PostModel>>
 

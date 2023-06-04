@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.fragment.CreatePostFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Создание записи"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textBlock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="7dp"
+                android:text="Ваша запись будет отображена в списке главной страницы"
+                android:textColor="#939396" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/mainContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/etTitle"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/default_editor_empty"
+                android:fontFamily="@font/sf_pro_reg"
+                android:hint="Заголовок"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="14dp"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/default_editor_empty"
+                android:fontFamily="@font/sf_pro_reg"
+                android:hint="Описание"
+                android:padding="14dp"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="7dp"
+                android:text="Укажите тип"
+                android:textColor="#939396" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:selectionRequired="true"
+                    android:layout_marginTop="16dp"
+                    android:paddingHorizontal="20dp"
+                    app:chipSpacingHorizontal="16dp"
+                    app:singleLine="true"
+                    app:singleSelection="true" />
+            </HorizontalScrollView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="7dp"
+                android:text="Когда запись потеряет актульность"
+                android:textColor="#939396" />
+
+            <TextView
+                android:id="@+id/etExpireDate"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/default_editor_empty"
+                android:fontFamily="@font/sf_pro_reg"
+                android:hint="Дата актуальности"
+                android:inputType="number"
+                android:maxLines="1"
+                android:padding="14dp"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="7dp"
+                android:text="Если вы собираетесь провести всречу, укажите, когда должно прийти уведомление"
+                android:textColor="#939396" />
+
+            <TextView
+                android:id="@+id/etNotificationDate"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/default_editor_empty"
+                android:fontFamily="@font/sf_pro_reg"
+                android:hint="Дата уведомления"
+                android:inputType="number"
+                android:maxLines="1"
+                android:padding="14dp"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cbPayable"
+                android:layout_width="match_parent"
+                android:layout_marginHorizontal="20dp"
+                android:buttonTint="@color/gold"
+                android:layout_marginTop="12dp"
+                android:layout_height="wrap_content"
+                android:text="Поставьте галочку, если " />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreatePost"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="34dp"
+            android:layout_marginBottom="30dp"
+            android:layout_weight="1"
+            android:insetTop="0dp"
+            android:enabled="false"
+            android:insetBottom="0dp"
+            android:text="Сохранить"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            app:backgroundTint="@color/inactive_button"
+            app:cornerRadius="10dp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
