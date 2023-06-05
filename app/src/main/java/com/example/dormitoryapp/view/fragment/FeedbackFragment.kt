@@ -49,6 +49,12 @@ class FeedbackFragment : Fragment() {
         viewModel.status.observe(viewLifecycleOwner){
             when(it){
                 FeedbackStatus.SUCCESS -> {
+                    with(binding){
+                        etAuthor.setText("")
+                        etComment.setText("")
+                        etComment.clearFocus()
+                        etAuthor.clearFocus()
+                    }
                     Toast.makeText(requireContext(), viewModel.feedbackResponse.value?.value?.message, Toast.LENGTH_SHORT).show()
                 }
                 FeedbackStatus.FAIL -> {

@@ -52,4 +52,12 @@ class PrefsManager(context: Context) {
     fun getProfile(): ProfileModel {
         return Gson().fromJson(prefs.getString("profile", "{ }"), ProfileModel::class.java)
     }
+
+    fun savePhoto(photo: String){
+        prefs.edit().putString("avatar", photo).apply()
+    }
+
+    fun getPhoto(): String? {
+        return prefs.getString("avatar", "")
+    }
 }

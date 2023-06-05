@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +24,7 @@ class UsersFragment : Fragment() {
     }
     private val viewModel: ProfileViewModel by viewModels()
     private lateinit var userAdapter: UserAdapter
+    private var users: List<ProfileModel>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,22 +40,24 @@ class UsersFragment : Fragment() {
         viewModel.getAllUsers()
         setObservers()
         initSwipeRefreshLayout()
+        initSearch()
     }
 
     private fun setObservers() {
         viewModel.users.observe(viewLifecycleOwner) {
             it?.let {
+                users = it
                 userAdapter.updateList(it)
             }
         }
-        viewModel.isLoading.observe(viewLifecycleOwner){
+        viewModel.isLoading.observe(viewLifecycleOwner) {
             binding.root.isRefreshing = it
         }
     }
 
-    private fun navigateToUserPage(user: ProfileModel){
+    private fun navigateToUserPage(user: ProfileModel) {
         val bundle = Bundle()
-        bundle.putSerializable("profile", user)
+        bundle.putInt("idProfile", user.id)
         findNavController().navigate(R.id.action_usersFragment_to_userFragment, bundle)
     }
 
@@ -70,6 +74,24 @@ class UsersFragment : Fragment() {
     private fun initSwipeRefreshLayout() {
         binding.root.setOnRefreshListener {
             lifecycleScope.launch {
+                viewModel.getAllUsers()
+            }
+        }
+    }
+
+    private fun initSearch(){
+        binding.etSearch.doOnTextChanged { text, start, before, count ->
+            if (text!!.isNotBlank()) {
+                users = users?.filter {
+                    it.firstName.lowercase()
+                        .contains(text.toString().lowercase()) || it.surname.lowercase()
+                        .contains(text.toString().lowercase()) || it.room.toString()
+                        .contains(text.toString().lowercase())
+                }
+                users?.let {
+                    userAdapter.updateList(it)
+                }
+            } else{
                 viewModel.getAllUsers()
             }
         }
