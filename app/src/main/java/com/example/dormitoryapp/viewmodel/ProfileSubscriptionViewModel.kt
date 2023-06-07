@@ -17,7 +17,9 @@ class ProfileSubscriptionViewModel(val app: Application) : AndroidViewModel(app)
 
     val profileSubscriptionOfUser = MutableLiveData<List<ProfileSubscriptionModel>>()
     val addPostSubscriptionResponse = MutableLiveData<ResponseModel>()
-    val status = MutableLiveData<PostSubscriptionStatus>()
+    val deletePostSubscriptionResponse = MutableLiveData<ResponseModel>()
+    val addStatus = MutableLiveData<PostSubscriptionStatus>()
+    val deleteStatus = MutableLiveData<PostSubscriptionStatus>()
 
     fun getProfileSubscriptions() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -26,9 +28,7 @@ class ProfileSubscriptionViewModel(val app: Application) : AndroidViewModel(app)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         profileSubscriptionOfUser.value = response.body()
-                        status.value = PostSubscriptionStatus.SUCCESS
                     } else {
-                        status.value = PostSubscriptionStatus.SUCCESS
                     }
                 }
 
@@ -46,9 +46,10 @@ class ProfileSubscriptionViewModel(val app: Application) : AndroidViewModel(app)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         addPostSubscriptionResponse.value = response.body()
+                        addStatus.value = PostSubscriptionStatus.SUCCESS
                         getProfileSubscriptions()
                     } else {
-
+                        addStatus.value = PostSubscriptionStatus.FAILURE
                     }
                 }
             } catch (e: Exception) {
@@ -64,15 +65,21 @@ class ProfileSubscriptionViewModel(val app: Application) : AndroidViewModel(app)
                 val response = DormitoryClient.retrofit.deleteProfileSubscription(sub)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        addPostSubscriptionResponse.value = response.body()
+                        deletePostSubscriptionResponse.value = response.body()
+                        deleteStatus.value = PostSubscriptionStatus.SUCCESS
                         getProfileSubscriptions()
                     } else {
-
+                        deleteStatus.value = PostSubscriptionStatus.FAILURE
                     }
                 }
             } catch (e: Exception) {
                 Log.d("deletePostSubscription error", e.message.toString())
             }
         }
+    }
+
+    fun clearStatus(){
+        addStatus.value = PostSubscriptionStatus.NOTHING
+        deleteStatus.value = PostSubscriptionStatus.NOTHING
     }
 }

@@ -1,6 +1,9 @@
 package com.example.dormitoryapp.view.fragment
 
+import android.app.Activity.RESULT_OK
 import android.app.ProgressDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,10 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FragmentProfileBinding
 import com.example.dormitoryapp.model.dto.ProfileModel
@@ -28,6 +33,15 @@ class ProfileFragment : Fragment() {
     }
 
     private val viewModel: ProfileViewModel by viewModels()
+
+    private val selectPhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        if(it.resultCode == RESULT_OK){
+            PrefsManager(requireContext()).savePhoto(it.data?.data.toString())
+            Glide.with(requireContext())
+                .load(it.data?.data)
+                .into(binding.ivAvatar)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -112,6 +126,10 @@ class ProfileFragment : Fragment() {
             etSurname.setText(profile.surname)
             etContactInfo.setText(profile.contactInfo)
             etGroupNumber.setText(profile.groupNumber.toString())
+            Glide.with(requireContext())
+                .load(Uri.parse(PrefsManager(requireContext()).getPhoto()))
+                .placeholder(R.drawable.photo_placeholder)
+                .into(ivAvatar)
         }
     }
 
@@ -150,6 +168,11 @@ class ProfileFragment : Fragment() {
                     )
                     viewModel.isLoading.value = true
                 }
+            }
+            ivAvatar.setOnClickListener {
+                selectPhotoLauncher.launch(Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "image/*"
+                })
             }
         }
     }

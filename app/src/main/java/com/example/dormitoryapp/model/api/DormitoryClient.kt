@@ -12,14 +12,12 @@ object DormitoryClient {
     private val interceptor: HttpLoggingInterceptor
         get() = HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) }
     private val client = OkHttpClient.Builder()
-        .protocols(listOf(Protocol.HTTP_1_1))
-        .readTimeout(40, TimeUnit.SECONDS)
-        .connectTimeout(40, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .connectTimeout(10, TimeUnit.SECONDS)
         .addInterceptor(interceptor)
-        .retryOnConnectionFailure(true)
         .build()
 
-    private val baseUrl = "http://192.168.2.5:45499/api/"
+    private val baseUrl = "http://192.168.43.171:45505/api/"
     val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())

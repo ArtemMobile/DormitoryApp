@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    android:layout_height="wrap_content"
+    tools:context=".view.fragment.OnboardingItemFragment">
+
+    <ImageView
+        android:id="@+id/onboardingImage"
+        android:layout_width="match_parent"
+        app:layout_constraintHeight_percent="0.7"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="24dp" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="заголовок"
+        android:layout_marginTop="20dp"
+        android:textAlignment="center"
+        android:layout_marginHorizontal="24dp"
+        android:textColor="@color/accent_bright"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/onboardingImage" />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:fontFamily="@font/sf_pro_reg"
+        android:text="Автоматическая смена сервера при потере связи для бесперебойного подключения"
+        android:textAlignment="center"
+        android:textColor="@color/accent_bright"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

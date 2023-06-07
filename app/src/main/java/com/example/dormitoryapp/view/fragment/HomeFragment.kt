@@ -1,6 +1,9 @@
 package com.example.dormitoryapp.view.fragment
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,11 +22,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FilterChipBinding
 import com.example.dormitoryapp.databinding.FragmentHomeBinding
+import com.example.dormitoryapp.databinding.NewsBottomSheetBinding
 import com.example.dormitoryapp.databinding.PostBottomSheetBinding
+import com.example.dormitoryapp.model.dto.NewsModel
 import com.example.dormitoryapp.model.dto.PostModel
 import com.example.dormitoryapp.model.dto.PostSubscriptionModel
 import com.example.dormitoryapp.model.dto.PostTypeModel
+import com.example.dormitoryapp.view.adapter.NewsAdapter
 import com.example.dormitoryapp.view.adapter.PostAdapter
+import com.example.dormitoryapp.viewmodel.NewsViewModel
 import com.example.dormitoryapp.viewmodel.PostSubscriptionViewModel
 import com.example.dormitoryapp.viewmodel.PostTypeViewModel
 import com.example.dormitoryapp.viewmodel.PostViewModel
@@ -42,7 +49,9 @@ class HomeFragment : Fragment() {
     private val postTypeViewModel: PostTypeViewModel by viewModels()
     private val viewModel: PostViewModel by viewModels()
     private val postSubscriptionViewModel: PostSubscriptionViewModel by viewModels()
+    private val newsViewModel: NewsViewModel by viewModels()
     private lateinit var postAdapter: PostAdapter
+    private lateinit var newsAdapter: NewsAdapter
     private var typesList: List<PostTypeModel>? = null
     private var bottomSheetDialogBinding: PostBottomSheetBinding? = null
     private var postSubscriptionsOfUser: List<PostSubscriptionModel>? = null
@@ -61,19 +70,42 @@ class HomeFragment : Fragment() {
         viewModel.getPosts()
         postTypeViewModel.getPostTypes()
         postSubscriptionViewModel.getProfileSubscriptions()
+        newsViewModel.getNews()
         setObservers()
         setUpAdapter()
         initSwipeRefreshLayout()
         initScroll()
         applyClicks()
-
+        initNewsRecycler()
         binding.etSearch.doOnTextChanged { text, start, before, count ->
-            filterList()
+            if(text!!.isNotBlank()){
+                posts = posts?.filter {
+                    it.name.lowercase().contains(
+                        binding.etSearch.text.toString().lowercase()
+                    ) || it.description.lowercase()
+                        .contains(binding.etSearch.text.toString().lowercase())
+                }
+                posts?.let { postAdapter.updatePosts(it) }
+            } else{
+                viewModel.getPosts()
+            }
+
         }
 
         with(binding.chipGroup) {
             setOnCheckedStateChangeListener { _, checkedIds ->
                 filterList()
+            }
+        }
+
+        binding.cbPayable.setOnCheckedChangeListener{ _, checked ->
+            if(checked){
+                posts = posts?.filter {it.isPayable == binding.cbPayable.isChecked}
+                posts?.let {
+                    postAdapter.updatePosts(it)
+                }
+            } else{
+                viewModel.getPosts()
             }
         }
     }
@@ -103,7 +135,7 @@ class HomeFragment : Fragment() {
 
         postTypeViewModel.types.observe(viewLifecycleOwner) { types ->
             typesList = types
-            if(binding.chipGroup.isEmpty()){
+            if (binding.chipGroup.isEmpty()) {
                 types.forEachIndexed { index, category ->
                     val chip =
                         FilterChipBinding.inflate(layoutInflater).rootChip.apply {
@@ -122,6 +154,10 @@ class HomeFragment : Fragment() {
 
         postSubscriptionViewModel.postSubscriptionOfUser.observe(viewLifecycleOwner) {
             postSubscriptionsOfUser = it
+        }
+
+        newsViewModel.news.observe(viewLifecycleOwner) {
+            newsAdapter.updateList(it)
         }
     }
 
@@ -170,7 +206,7 @@ class HomeFragment : Fragment() {
             }
 
             cardPay.setOnClickListener {
-                Toast.makeText(requireContext(), "Автор записи...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Автор предлаагет материальное вознаграждение за помощь", Toast.LENGTH_LONG).show()
             }
 
             btnSubscribe.apply {
@@ -191,6 +227,21 @@ class HomeFragment : Fragment() {
             }
         }
         bottomSheetDialog.show()
+    }
+
+    private fun showNewsDialog(newsModel: NewsModel) {
+        val newsDialogBinding = NewsBottomSheetBinding.inflate(layoutInflater)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(newsDialogBinding.root)
+            .create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        newsDialogBinding.tvTitle.text = newsModel.title
+        newsDialogBinding.tvContent.text = newsModel.content
+        newsDialogBinding.ivClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -214,8 +265,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun initScroll(){
-        with(binding.nestedScrollView){
+    private fun initScroll() {
+        with(binding.nestedScrollView) {
             setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                 var difference = (scrollY - oldScrollY)
                 if (difference > 0) {
@@ -229,44 +280,25 @@ class HomeFragment : Fragment() {
 
 
     private fun filterList() {
-        if (binding.etSearch.text.toString().isNotEmpty()) {
-            posts = posts?.filter {
-                it.name.lowercase().contains(
-                    binding.etSearch.text.toString().lowercase()
-                ) || it.description.lowercase()
-                    .contains(binding.etSearch.text.toString().lowercase())
-            }
-        } else {
-
-        }
-
         val type = binding.chipGroup.checkedChipId
         if (type != -1) {
             posts = posts?.filter { it.idType == type }
         } else {
             viewModel.getPosts()
         }
-
-
-//        val checkedChip = binding.chipGroup.checkedChipId
-//        val idType = checkedChip
-//        posts = posts?.filter { it.idType == idType }
-
-//        with(binding.chipGroup) {
-//            setOnCheckedStateChangeListener { _, checkedIds ->
-//                if (checkedIds.isNotEmpty()) {
-//                    val idType = checkedIds[0]
-//
-//                    viewModel.getPostByType(idType)
-//
-//                } else {
-//
-//                }
-//            }
-//        }
-
         posts?.let { postAdapter.updatePosts(it) }
 
+    }
+
+    private fun initNewsRecycler() {
+        newsAdapter = NewsAdapter(requireContext(), listOf(), onClick = {
+            showNewsDialog(it)
+        })
+        with(binding.rvNews) {
+            adapter = newsAdapter
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        }
     }
 
 
