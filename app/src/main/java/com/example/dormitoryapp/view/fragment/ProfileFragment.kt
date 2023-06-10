@@ -3,16 +3,20 @@ package com.example.dormitoryapp.view.fragment
 import android.app.Activity.RESULT_OK
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -25,6 +29,8 @@ import com.example.dormitoryapp.model.dto.Value
 import com.example.dormitoryapp.utils.CreateProfileStatus
 import com.example.dormitoryapp.utils.PrefsManager
 import com.example.dormitoryapp.viewmodel.ProfileViewModel
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 
 class ProfileFragment : Fragment() {
 
@@ -34,14 +40,34 @@ class ProfileFragment : Fragment() {
 
     private val viewModel: ProfileViewModel by viewModels()
 
-    private val selectPhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        if(it.resultCode == RESULT_OK){
-            PrefsManager(requireContext()).savePhoto(it.data?.data.toString())
-            Glide.with(requireContext())
-                .load(it.data?.data)
-                .into(binding.ivAvatar)
+    private val selectPhotoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                PrefsManager(requireContext()).savePhoto(it.data?.data.toString())
+                Glide.with(requireContext())
+                    .load(it.data?.data)
+                    .into(binding.ivAvatar)
+            }
+        }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            getFirebaseToken()
+            Toast.makeText(requireContext(), "Разрешение получено", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Пожалуйста, дайте разрешение на отправку уведомлений",
+                Toast.LENGTH_LONG
+            ).show()
+
         }
     }
+
+    private var deviceId = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,6 +87,7 @@ class ProfileFragment : Fragment() {
         applyEditors()
         applyClicks()
         setObservers()
+        askNotificationPermission()
         viewModel.getProfileId()
     }
 
@@ -112,7 +139,7 @@ class ProfileFragment : Fragment() {
             setData(it)
         }
 
-        viewModel.profileId.observe(viewLifecycleOwner){
+        viewModel.profileId.observe(viewLifecycleOwner) {
             viewModel.getProfileById(it)
         }
     }
@@ -148,7 +175,9 @@ class ProfileFragment : Fragment() {
                             etRoom.text.toString().toInt(),
                             etSurname.text.toString(),
                             PrefsManager(requireContext()).getEmail(),
-                            viewModel.profileId.value!!
+                            viewModel.profileId.value!!,
+                            deviceId,
+                            true
                         ), viewModel.profileId.value!!
                     )
                 } else {
@@ -163,7 +192,9 @@ class ProfileFragment : Fragment() {
                             etRoom.text.toString().toInt(),
                             etSurname.text.toString(),
                             PrefsManager(requireContext()).getEmail(),
-                            0
+                            0,
+                            deviceId,
+                            true
                         )
                     )
                     viewModel.isLoading.value = true
@@ -233,6 +264,40 @@ class ProfileFragment : Fragment() {
                     )
                 )
             }
+        }
+    }
+
+    private fun getFirebaseToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("Token", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            val token = task.result
+            Log.d("Token", token)
+            deviceId = token
+        })
+    }
+
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {  // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                Log.d("MainFragment", "askNotificationPermission: sadlfjajlsdf")
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            getFirebaseToken()
         }
     }
 }

@@ -73,27 +73,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardPay"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/gold"
-                    app:cardCornerRadius="40dp"
-                    app:layout_constraintBottom_toTopOf="@+id/textView3"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/textView3"
-                    app:layout_constraintTop_toTopOf="parent">
-
                     <TextView
+                        android:id="@+id/cardPay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:background="@drawable/money"
                         android:paddingHorizontal="12dp"
                         android:fontFamily="@font/sf_pro_reg"
                         android:paddingVertical="6dp"
                         android:text="₽"
-                        android:textColor="@color/white" />
-                </com.google.android.material.card.MaterialCardView>
+                        android:textColor="@color/accent" />
+
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -151,9 +142,7 @@
                 android:textColor="@color/accent"
                 android:textSize="14sp" />
 
-
         </LinearLayout>
-
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubscribe"
@@ -162,6 +151,19 @@
             android:layout_marginTop="20dp"
             android:letterSpacing="0"
             android:text="Подписаться на рассылку"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            app:backgroundTint="@color/accent"
+            app:cornerRadius="10dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNotify"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="20dp"
+            android:letterSpacing="0"
+            android:text="Откликнуться"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="17sp"

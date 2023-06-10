@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
+        android:name=".app.DormApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,9 +14,25 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.DormitoryApp"
-        android:name=".app.DormApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <service
+            android:name=".MessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+                    <meta-data
+                        android:name="com.google.firebase.messaging.default_notification_icon"
+                        android:resource="@drawable/og" />
+                    <meta-data
+                        android:name="com.google.firebase.messaging.default_notification_color"
+                        android:resource="@color/accent" />
+
+
         <activity
             android:name=".view.activity.StartActivity"
             android:exported="true">
@@ -27,8 +45,8 @@
 
         <activity
             android:name=".view.activity.MainActivity"
-            android:exported="true">
+            android:exported="true" >
+
         </activity>
     </application>
-
 </manifest>

@@ -17,7 +17,7 @@ object DormitoryClient {
         .addInterceptor(interceptor)
         .build()
 
-    private val baseUrl = "http://192.168.43.171:45505/api/"
+    private val baseUrl = "http://192.168.2.5:45459/api/"
     val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())

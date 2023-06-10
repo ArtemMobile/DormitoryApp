@@ -2,6 +2,7 @@ package com.example.dormitoryapp.view.fragment
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -28,12 +29,10 @@ import com.example.dormitoryapp.model.dto.NewsModel
 import com.example.dormitoryapp.model.dto.PostModel
 import com.example.dormitoryapp.model.dto.PostSubscriptionModel
 import com.example.dormitoryapp.model.dto.PostTypeModel
+import com.example.dormitoryapp.utils.PrefsManager
 import com.example.dormitoryapp.view.adapter.NewsAdapter
 import com.example.dormitoryapp.view.adapter.PostAdapter
-import com.example.dormitoryapp.viewmodel.NewsViewModel
-import com.example.dormitoryapp.viewmodel.PostSubscriptionViewModel
-import com.example.dormitoryapp.viewmodel.PostTypeViewModel
-import com.example.dormitoryapp.viewmodel.PostViewModel
+import com.example.dormitoryapp.viewmodel.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -50,6 +49,7 @@ class HomeFragment : Fragment() {
     private val viewModel: PostViewModel by viewModels()
     private val postSubscriptionViewModel: PostSubscriptionViewModel by viewModels()
     private val newsViewModel: NewsViewModel by viewModels()
+    private val notificationViewModel: NotificationViewModel by viewModels()
     private lateinit var postAdapter: PostAdapter
     private lateinit var newsAdapter: NewsAdapter
     private var typesList: List<PostTypeModel>? = null
@@ -77,8 +77,9 @@ class HomeFragment : Fragment() {
         initScroll()
         applyClicks()
         initNewsRecycler()
+
         binding.etSearch.doOnTextChanged { text, start, before, count ->
-            if(text!!.isNotBlank()){
+            if (text!!.isNotBlank()) {
                 posts = posts?.filter {
                     it.name.lowercase().contains(
                         binding.etSearch.text.toString().lowercase()
@@ -86,10 +87,9 @@ class HomeFragment : Fragment() {
                         .contains(binding.etSearch.text.toString().lowercase())
                 }
                 posts?.let { postAdapter.updatePosts(it) }
-            } else{
+            } else {
                 viewModel.getPosts()
             }
-
         }
 
         with(binding.chipGroup) {
@@ -98,17 +98,20 @@ class HomeFragment : Fragment() {
             }
         }
 
-        binding.cbPayable.setOnCheckedChangeListener{ _, checked ->
-            if(checked){
-                posts = posts?.filter {it.isPayable == binding.cbPayable.isChecked}
+        binding.cbPayable.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                posts = posts?.filter { it.isPayable == binding.cbPayable.isChecked }
                 posts?.let {
                     postAdapter.updatePosts(it)
                 }
-            } else{
+            } else {
                 viewModel.getPosts()
             }
         }
     }
+
+
+
 
     private fun applyClicks() {
         binding.fab.setOnClickListener {
@@ -124,6 +127,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun setObservers() {
+        val dialog = ProgressDialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setMessage("Ждём-ждём")
+
         viewModel.posts.observe(viewLifecycleOwner) {
             posts = it
             postAdapter.updatePosts(it)
@@ -159,6 +166,14 @@ class HomeFragment : Fragment() {
         newsViewModel.news.observe(viewLifecycleOwner) {
             newsAdapter.updateList(it)
         }
+
+        notificationViewModel.isLoading.observe(viewLifecycleOwner) {
+            if (it) {
+                dialog.show()
+            } else {
+                dialog.dismiss()
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -179,9 +194,14 @@ class HomeFragment : Fragment() {
             tvAuthor.text = "${postModel.firstName} ${postModel.surname} "
             tvAuthor.setOnClickListener {
                 bottomSheetDialog.dismiss()
-                val bundle = Bundle()
-                bundle.putInt("idProfile", postModel.idProfile)
-                findNavController().navigate(R.id.action_homeFragment_to_userFragment, bundle)
+                if (postModel.idProfile == PrefsManager(requireContext()).getProfile().id) {
+                    findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
+                } else {
+                    val bundle = Bundle()
+                    bundle.putInt("idProfile", postModel.idProfile)
+                    findNavController().navigate(R.id.action_homeFragment_to_userFragment, bundle)
+                }
+
             }
 
             if (postModel.notificationDate != null) {
@@ -189,10 +209,21 @@ class HomeFragment : Fragment() {
                     DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm")
                         .format(LocalDateTime.parse(postModel.notificationDate))
                 }"
+                btnNotify.visibility = View.GONE
 
             } else {
                 btnSubscribe.visibility = View.GONE
                 tvNotificationDate.visibility = View.GONE
+                btnNotify.visibility = View.VISIBLE
+            }
+
+            if (postModel.idProfile == PrefsManager(
+                    requireContext()
+                ).getProfile().id
+            ) {
+
+            } else {
+
             }
 
             if (postModel.isPayable) {
@@ -206,7 +237,11 @@ class HomeFragment : Fragment() {
             }
 
             cardPay.setOnClickListener {
-                Toast.makeText(requireContext(), "Автор предлаагет материальное вознаграждение за помощь", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Автор предлаагет материальное вознаграждение за помощь",
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             btnSubscribe.apply {
@@ -224,6 +259,10 @@ class HomeFragment : Fragment() {
                         bottomSheetDialog.dismiss()
                     }
                 }
+            }
+
+            btnNotify.setOnClickListener {
+                notificationViewModel.sendNotifications(postModel.idProfile, postModel.id)
             }
         }
         bottomSheetDialog.show()

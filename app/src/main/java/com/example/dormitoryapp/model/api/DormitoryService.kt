@@ -2,7 +2,6 @@ package com.example.dormitoryapp.model.api
 
 import com.example.dormitoryapp.model.dto.*
 import io.reactivex.rxjava3.core.Observable
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -27,7 +26,7 @@ interface DormitoryService {
     ): Response<ProfileResponse>
 
     @GET("Post")
-    suspend fun getPostsData( @Header("Connection") connection: String = "close"): Response<List<PostModel>>
+    suspend fun getPostsData(@Header("Connection") connection: String = "close"): Response<List<PostModel>>
 
     @GET("Post/byType")
     suspend fun getPostsByType(
@@ -51,23 +50,30 @@ interface DormitoryService {
     suspend fun createPost(@Body createPostModel: CreatePostModel): Response<ResponseModel>
 
     @GET("PostSubscription/{idProfile}")
-    suspend fun getPostSubscriptionsByProfile(@Path("idProfile") idProfile: Int) : Response<List<PostSubscriptionModel>>
+    suspend fun getPostSubscriptionsByProfile(@Path("idProfile") idProfile: Int): Response<List<PostSubscriptionModel>>
 
     @POST("PostSubscription")
-    suspend fun addPostSubscription(@Body createPostSubscriptionModel: CreatePostSubscriptionModel) : Response<ResponseModel>
+    suspend fun addPostSubscription(@Body createPostSubscriptionModel: CreatePostSubscriptionModel): Response<ResponseModel>
 
     @HTTP(method = "DELETE", path = "PostSubscription", hasBody = true)
-    suspend fun deletePostSubscription(@Body createPostSubscriptionModel: CreatePostSubscriptionModel) : Response<ResponseModel>
+    suspend fun deletePostSubscription(@Body createPostSubscriptionModel: CreatePostSubscriptionModel): Response<ResponseModel>
 
 
     @GET("ProfileSubscription/{idProfile}")
-    suspend fun getProfileSubscriptionsByProfile(@Path("idProfile") idProfile: Int) : Response<List<ProfileSubscriptionModel>>
+    suspend fun getProfileSubscriptionsByProfile(@Path("idProfile") idProfile: Int): Response<List<ProfileSubscriptionModel>>
 
     @POST("ProfileSubscription")
-    suspend fun addProfileSubscription(@Body createProfeltSubscriptionModel: CreateProfileSubscriptionModel) : Response<ResponseModel>
+    suspend fun addProfileSubscription(@Body createProfeltSubscriptionModel: CreateProfileSubscriptionModel): Response<ResponseModel>
 
     @HTTP(method = "DELETE", path = "ProfileSubscription", hasBody = true)
-    suspend fun deleteProfileSubscription(@Body createPostSubscriptionModel: CreateProfileSubscriptionModel) : Response<ResponseModel>
+    suspend fun deleteProfileSubscription(@Body createPostSubscriptionModel: CreateProfileSubscriptionModel): Response<ResponseModel>
+
+    @POST("Notification?")
+    suspend fun sendNotification(
+        @Query("idNotifier") idNotifier: Int,
+        @Query("idNotifying") idNotifying: Int,
+        @Query("idPost") idPost: Int,
+    ): Response<ResponseModel>
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

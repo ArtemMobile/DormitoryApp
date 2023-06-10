@@ -12,7 +12,9 @@ data class ProfileModel(
     val room: Int,
     val surname: String,
     val telegramNick: String,
-    val id: Int
+    val id: Int,
+    val deviceId: String,
+    val isLogged: Boolean
 ) : Serializable {
     override fun hashCode(): Int {
         return super.hashCode()
