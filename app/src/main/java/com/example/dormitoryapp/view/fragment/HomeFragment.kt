@@ -110,9 +110,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-
-
-
     private fun applyClicks() {
         binding.fab.setOnClickListener {
             val bundle = Bundle()
@@ -201,29 +198,32 @@ class HomeFragment : Fragment() {
                     bundle.putInt("idProfile", postModel.idProfile)
                     findNavController().navigate(R.id.action_homeFragment_to_userFragment, bundle)
                 }
-
-            }
-
-            if (postModel.notificationDate != null) {
-                tvNotificationDate.text = "Уведомление придёт: ${
-                    DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm")
-                        .format(LocalDateTime.parse(postModel.notificationDate))
-                }"
-                btnNotify.visibility = View.GONE
-
-            } else {
-                btnSubscribe.visibility = View.GONE
-                tvNotificationDate.visibility = View.GONE
-                btnNotify.visibility = View.VISIBLE
             }
 
             if (postModel.idProfile == PrefsManager(
                     requireContext()
                 ).getProfile().id
             ) {
-
+                btnNotify.visibility = View.GONE
+                btnSubscribe.visibility = View.GONE
+                btnEdit.visibility = View.VISIBLE
+                tvNotificationDate.visibility = View.GONE
             } else {
+                btnNotify.visibility = View.VISIBLE
+                btnSubscribe.visibility = View.VISIBLE
+                btnEdit.visibility = View.GONE
+                if (postModel.notificationDate != null) {
+                    tvNotificationDate.text = "Уведомление придёт: ${
+                        DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm")
+                            .format(LocalDateTime.parse(postModel.notificationDate))
+                    }"
+                    btnNotify.visibility = View.GONE
 
+                } else {
+                    btnSubscribe.visibility = View.GONE
+                    tvNotificationDate.visibility = View.GONE
+                    btnNotify.visibility = View.VISIBLE
+                }
             }
 
             if (postModel.isPayable) {
@@ -263,6 +263,18 @@ class HomeFragment : Fragment() {
 
             btnNotify.setOnClickListener {
                 notificationViewModel.sendNotifications(postModel.idProfile, postModel.id)
+            }
+
+            btnEdit.setOnClickListener {
+                val bundle = Bundle()
+                bundle.putSerializable("post", postModel)
+                if (typesList != null) {
+                    bundle.putString("types", Gson().toJson(typesList))
+                } else {
+                    bundle.putString("types", null)
+                }
+                bottomSheetDialog.dismiss()
+                findNavController().navigate(R.id.action_homeFragment_to_createPostFragment, bundle)
             }
         }
         bottomSheetDialog.show()

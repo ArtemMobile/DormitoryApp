@@ -1,18 +1,21 @@
 package com.example.dormitoryapp.view.fragment
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.view.isEmpty
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
@@ -22,6 +25,7 @@ import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FilterChipBinding
 import com.example.dormitoryapp.databinding.FragmentCreatePostBinding
 import com.example.dormitoryapp.model.dto.CreatePostModel
+import com.example.dormitoryapp.model.dto.PostModel
 import com.example.dormitoryapp.model.dto.PostTypeModel
 import com.example.dormitoryapp.utils.CreatePostStatus
 import com.example.dormitoryapp.utils.PrefsManager
@@ -29,10 +33,10 @@ import com.example.dormitoryapp.viewmodel.PostViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-
 
 @SuppressLint("SetTextI18n", "SimpleDateFormat")
 class CreatePostFragment : Fragment() {
@@ -53,6 +57,7 @@ class CreatePostFragment : Fragment() {
 
     private val expireCalendar = GregorianCalendar.getInstance()
     private val notificationCalendar = GregorianCalendar.getInstance()
+    private var post: PostModel? = null
 
     private val expireDateSetListener: DatePickerDialog.OnDateSetListener by lazy {
         DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
@@ -73,8 +78,18 @@ class CreatePostFragment : Fragment() {
                 true
             ).apply {
                 setTitle("Выберите время")
-
-            }.show()
+                show()
+                getButton(DatePickerDialog.BUTTON_NEGATIVE).apply {
+                    text = "Отмена"
+                    isAllCaps = false
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+                }
+                getButton(DatePickerDialog.BUTTON_POSITIVE).apply {
+                    text = "Выбрать"
+                    isAllCaps = false
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+                }
+            }
         }
     }
 
@@ -97,6 +112,17 @@ class CreatePostFragment : Fragment() {
                 true
             ).apply {
                 setTitle("Выберите время уведомления")
+                show()
+                getButton(DatePickerDialog.BUTTON_NEGATIVE).apply {
+                    text = "Отмена"
+                    isAllCaps = false
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+                }
+                getButton(DatePickerDialog.BUTTON_POSITIVE).apply {
+                    text = "Выбрать"
+                    isAllCaps = false
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+                }
             }.show()
         }
     }
@@ -109,11 +135,71 @@ class CreatePostFragment : Fragment() {
         setObservers()
         applyFields()
         applySpinner()
+        post = arguments?.getSerializable("post") as? PostModel
+        if (post != null) {
+            setData(post!!)
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setData(postModel: PostModel) {
+        with(binding) {
+            tvCreatePost.text = "Редактирование записи"
+            btnCreatePost.text = "Редактировать"
+            etTitle.setText(postModel.title)
+            etDescription.setText(postModel.description)
+            val expireDate = LocalDateTime.parse(postModel.expireDate)
+            postModel.notificationDate?.let {
+                val notificationDate = LocalDateTime.parse(it)
+                notificationDate?.let {
+                    etNotificationDate.setText(
+                        DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(it)
+                    )
+                }
+            }
+            etExpireDate.setText(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(expireDate))
+            cbPayable.isChecked = postModel.isPayable
+            etTitle.setText(postModel.title)
+            chipGroup.check(postModel.idType)
+            btnDeletePost.visibility = View.VISIBLE
+        }
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private fun showClearTextDialog(view: View) {
+        val dialog = AlertDialog.Builder(requireContext(), R.style.ColorPickerTheme)
+            .setTitle("Очистка даты")
+            .setMessage("Вы точно хотите очистить дату?")
+            .setPositiveButton("Да") { _, _ -> (view as TextView).text = "" }
+            .setNegativeButton("Нет") { _, _ -> }
+            .create()
+        dialog.show()
+
+        val posBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        posBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+        posBtn.isAllCaps = false
+
+        val negBtn = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        negBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+        negBtn.isAllCaps = false
+
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun applyClicks() {
         with(binding) {
+            etExpireDate.setOnLongClickListener {
+                showClearTextDialog(it)
+                true
+            }
+
+            etNotificationDate.setOnLongClickListener {
+                showClearTextDialog(it)
+                true
+            }
+
             etExpireDate.setOnClickListener {
                 showExpireDatePicker()
             }
@@ -124,24 +210,41 @@ class CreatePostFragment : Fragment() {
 
             btnCreatePost.setOnClickListener {
                 val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-                val notificationDateTime = LocalDateTime.ofInstant(
-                    notificationCalendar.toInstant(),
-                    notificationCalendar.timeZone.toZoneId()
-                ).toLocalDate()
+
                 val expireDate =
                     LocalDateTime.parse(binding.etExpireDate.text.toString(), formatter)
+                var notificationDate : LocalDateTime? = null
+                if(binding.etNotificationDate.text.toString().isNotEmpty() || binding.etNotificationDate.text.toString().isNotBlank()){
+                    notificationDate =
+                        LocalDateTime.parse(binding.etNotificationDate.text.toString(), formatter)
+                }
                 if (datesAreValid()) {
-                    viewModel.createPost(
-                        CreatePostModel(
-                            etTitle.text.toString(),
-                            etDescription.text.toString(),
-                            binding.chipGroup.checkedChipId,
-                            PrefsManager(requireContext()).getProfile().id,
-                            notificationDateTime.toString(),
-                            cbPayable.isChecked,
-                            expireDate.toString()
+                    if (post != null) {
+                        viewModel.updatePost(
+                            CreatePostModel(
+                                etTitle.text.toString(),
+                                etDescription.text.toString(),
+                                binding.chipGroup.checkedChipId,
+                                PrefsManager(requireContext()).getProfile().id,
+                                notificationDate?.toString() ?: LocalDate.now().toString(),
+                                cbPayable.isChecked,
+                                expireDate.toString()
+                            ),
+                            post!!.id
                         )
-                    )
+                    } else {
+                        viewModel.createPost(
+                            CreatePostModel(
+                                etTitle.text.toString(),
+                                etDescription.text.toString(),
+                                binding.chipGroup.checkedChipId,
+                                PrefsManager(requireContext()).getProfile().id,
+                                notificationDate?.toString() ?: LocalDate.now().toString(),
+                                cbPayable.isChecked,
+                                expireDate.toString()
+                            )
+                        )
+                    }
                 } else {
                     Toast.makeText(
                         requireContext(),
@@ -173,10 +276,29 @@ class CreatePostFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.updatePostResponse.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.value.message, Toast.LENGTH_SHORT).show()
+        }
+
+        viewModel.updatePostStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                CreatePostStatus.SUCCESS -> {
+                    findNavController().popBackStack()
+                    viewModel.clearUpdatePostStatus()
+                }
+                CreatePostStatus.FAILURE -> {
+
+                }
+                CreatePostStatus.NOTHING -> {
+
+                }
+            }
+        }
     }
 
     private fun showExpireDatePicker() {
-        DatePickerDialog(
+        val dialog = DatePickerDialog(
             requireContext(),
             R.style.ColorPickerTheme,
             expireDateSetListener,
@@ -186,12 +308,24 @@ class CreatePostFragment : Fragment() {
         ).apply {
             setTitle("Выберите дату потери актуальности")
             datePicker.minDate = System.currentTimeMillis()
-        }.show()
+        }
+        dialog.show()
+        dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).apply {
+            text = "Отмена"
+            isAllCaps = false
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+        }
+        dialog.getButton(DatePickerDialog.BUTTON_POSITIVE).apply {
+            text = "Выбрать"
+            isAllCaps = false
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+        }
     }
 
     private fun showNotificationTimePicker() {
-        DatePickerDialog(
+        val dialog = DatePickerDialog(
             requireContext(),
+            R.style.ColorPickerTheme,
             notificationDateSetListener,
             notificationCalendar.get(Calendar.YEAR),
             notificationCalendar.get(Calendar.MONTH),
@@ -199,16 +333,37 @@ class CreatePostFragment : Fragment() {
         ).apply {
             setTitle("Выберите дату уведомления")
             datePicker.minDate = System.currentTimeMillis()
-        }.show()
+        }
+        dialog.show()
+        dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).apply {
+            text = "Отмена"
+            isAllCaps = false
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+        }
+        dialog.getButton(DatePickerDialog.BUTTON_POSITIVE).apply {
+            text = "Выбрать"
+            isAllCaps = false
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun datesAreValid(): Boolean {
         if (binding.etNotificationDate.text.toString().isNotEmpty()) {
-            return expireCalendar.time > Calendar.getInstance().time && notificationCalendar.time > Calendar.getInstance().time && expireCalendar.time >= notificationCalendar.time
+            val notificationDate = LocalDateTime.parse(binding.etNotificationDate.text.toString(),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
+            val expireDate = LocalDateTime.parse(binding.etExpireDate.text.toString(),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
+            Log.d("DATE", notificationCalendar.time.toString())
+            return  (expireDate.isAfter(notificationDate) || expireDate.isEqual(notificationDate))
+                    && binding.etNotificationDate.text.toString()
+                .isNotEmpty() && binding.etExpireDate.text.toString().isNotEmpty()
         } else {
-            return expireCalendar.time > Calendar.getInstance().time
+            val expireDate = LocalDateTime.parse(binding.etExpireDate.text.toString(),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
+            return expireDate.isAfter(LocalDateTime.now())
+                    && binding.etExpireDate.text.toString().isNotEmpty()
         }
-
     }
 
     private fun applyFields() {

@@ -25,12 +25,12 @@
             </intent-filter>
         </service>
 
-                    <meta-data
-                        android:name="com.google.firebase.messaging.default_notification_icon"
-                        android:resource="@drawable/og" />
-                    <meta-data
-                        android:name="com.google.firebase.messaging.default_notification_color"
-                        android:resource="@color/accent" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/og" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/accent" />
 
 
         <activity
@@ -45,7 +45,8 @@
 
         <activity
             android:name=".view.activity.MainActivity"
-            android:exported="true" >
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing">
 
         </activity>
     </application>

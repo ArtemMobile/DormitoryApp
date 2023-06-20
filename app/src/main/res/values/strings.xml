@@ -9,4 +9,6 @@
     <string name="next">Далее</string>
     <string name="enter_by_what">Вход через электронную почту</string>
     <string name="feedback_template">Ваше мнение очень важно для нас!\nВы можете помочь нам в улучшении\nкачества работы сервиса, оставив свой отзыв.</string>
+    <string name="waiting">Подождите, данные подгружаются</string>
+    <string name="waiting_to_create">Подождите</string>
 </resources>

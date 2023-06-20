@@ -49,6 +49,12 @@ interface DormitoryService {
     @POST("Post")
     suspend fun createPost(@Body createPostModel: CreatePostModel): Response<ResponseModel>
 
+    @PUT("Post")
+    suspend fun updatePost(
+        @Body createPostModel: CreatePostModel,
+        @Query("id") id: Int
+    ): Response<ResponseModel>
+
     @GET("PostSubscription/{idProfile}")
     suspend fun getPostSubscriptionsByProfile(@Path("idProfile") idProfile: Int): Response<List<PostSubscriptionModel>>
 

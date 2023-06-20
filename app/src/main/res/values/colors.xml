@@ -14,4 +14,5 @@
     <color name="inactive_button">#C9D4FB</color>
     <color name="grey_bottom_nav_item">#B8C1CC</color>
     <color name="gold">#FFFF00</color>
+    <color name="red">#F44336</color>
 </resources>

@@ -169,6 +169,20 @@
             android:textSize="17sp"
             app:backgroundTint="@color/accent"
             app:cornerRadius="10dp" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEdit"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="20dp"
+            android:letterSpacing="0"
+            android:text="Редактировать"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            app:backgroundTint="@color/accent"
+            app:cornerRadius="10dp" />
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

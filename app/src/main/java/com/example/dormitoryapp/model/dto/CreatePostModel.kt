@@ -8,4 +8,8 @@ data class CreatePostModel(
     val notificationDate: String,
     val isPayable: Boolean,
     val expireDate: String
-)
+): java.io.Serializable{
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+}

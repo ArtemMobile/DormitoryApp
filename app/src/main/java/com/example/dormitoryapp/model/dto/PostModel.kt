@@ -11,5 +11,10 @@ data class PostModel(
     val publishDate: String,
     val title: String,
     val firstName: String,
-    val surname: String
-)
+    val surname: String,
+    val expireDate: String
+) : java.io.Serializable{
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+}

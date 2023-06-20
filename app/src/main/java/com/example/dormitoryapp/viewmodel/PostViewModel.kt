@@ -9,6 +9,7 @@ import com.example.dormitoryapp.model.dto.CreatePostModel
 import com.example.dormitoryapp.model.dto.PostModel
 import com.example.dormitoryapp.model.dto.ResponseModel
 import com.example.dormitoryapp.utils.CreatePostStatus
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,7 +19,9 @@ class PostViewModel : ViewModel() {
     val error = MutableLiveData<String>()
     val isLoading = MutableLiveData<Boolean>()
     val createPostResponse = MutableLiveData<ResponseModel>()
+    val updatePostResponse = MutableLiveData<ResponseModel>()
     val createPostStatus = MutableLiveData<CreatePostStatus>()
+    val updatePostStatus = MutableLiveData<CreatePostStatus>()
     fun getPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -39,7 +42,7 @@ class PostViewModel : ViewModel() {
         }
     }
 
-    fun getPostByType(idType: Int){
+    fun getPostByType(idType: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 isLoading.postValue(true)
@@ -83,7 +86,36 @@ class PostViewModel : ViewModel() {
         }
     }
 
-    fun clearCreatePostStatus(){
+    fun updatePost(createPostModel: CreatePostModel, idPost: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                isLoading.postValue(true)
+                val response = DormitoryClient.retrofit.updatePost(createPostModel, idPost)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        updatePostResponse.value = response.body()
+                        updatePostStatus.value = CreatePostStatus.SUCCESS
+                        Log.d("updatedPost", createPostModel.toString())
+                        isLoading.value = false
+                    } else {
+                        updatePostResponse.value = Gson().fromJson(response.errorBody()?.string(), ResponseModel::class.java)
+                        updatePostStatus.value = CreatePostStatus.FAILURE
+                        Log.d("updatePostFailure", response.errorBody()?.string().toString())
+                    }
+                }
+
+            } catch (e: java.lang.Exception) {
+                e.localizedMessage?.let { Log.d("updatePostException", it) }
+            }
+        }
+    }
+
+    fun clearCreatePostStatus() {
         createPostStatus.value = CreatePostStatus.NOTHING
     }
+
+    fun clearUpdatePostStatus() {
+        updatePostStatus.value = CreatePostStatus.NOTHING
+    }
+
 }

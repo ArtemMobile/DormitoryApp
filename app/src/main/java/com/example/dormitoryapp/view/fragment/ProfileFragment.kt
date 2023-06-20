@@ -1,7 +1,6 @@
 package com.example.dormitoryapp.view.fragment
 
 import android.app.Activity.RESULT_OK
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -16,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
@@ -24,6 +24,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FragmentProfileBinding
+import com.example.dormitoryapp.databinding.ProgressDialogBinding
 import com.example.dormitoryapp.model.dto.ProfileModel
 import com.example.dormitoryapp.model.dto.Value
 import com.example.dormitoryapp.utils.CreateProfileStatus
@@ -54,7 +55,9 @@ class ProfileFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            getFirebaseToken()
+            if (PrefsManager(requireContext()).getProfile().deviceId == "") {
+                getFirebaseToken()
+            }
             Toast.makeText(requireContext(), "Разрешение получено", Toast.LENGTH_SHORT)
                 .show()
         } else {
@@ -89,12 +92,15 @@ class ProfileFragment : Fragment() {
         setObservers()
         askNotificationPermission()
         viewModel.getProfileId()
+        binding.root.isEnabled = false
     }
 
     private fun setObservers() {
-        val dialog = ProgressDialog(requireContext())
-        dialog.setCancelable(false)
-        dialog.setMessage("Ждём-ждём")
+        val dialogBinding = ProgressDialogBinding.inflate(layoutInflater)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setCancelable(false)
+            .setView(dialogBinding.root)
+            .create()
         viewModel.createProfileStatus.observe(viewLifecycleOwner) {
             when (it) {
                 CreateProfileStatus.SUCCESS -> {
@@ -133,6 +139,11 @@ class ProfileFragment : Fragment() {
             } else {
                 dialog.dismiss()
             }
+        }
+
+        viewModel.isWaiting.observe(viewLifecycleOwner){
+            binding.root.isRefreshing = it
+            binding.root.setColorSchemeResources(R.color.accent)
         }
 
         viewModel.profile.observe(viewLifecycleOwner) {
@@ -297,7 +308,9 @@ class ProfileFragment : Fragment() {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         } else {
-            getFirebaseToken()
+            if (PrefsManager(requireContext()).getProfile().deviceId == "") {
+                getFirebaseToken()
+            }
         }
     }
 }
