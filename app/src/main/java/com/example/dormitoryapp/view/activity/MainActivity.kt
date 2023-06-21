@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
                     .setTitle(title)
                     .setMessage(body)
                     .setNeutralButton("OK", { _, _ -> })
+                    .setPositiveButton("Посмотреть профиль", { _, _ -> })
                     .show()
             }
         }

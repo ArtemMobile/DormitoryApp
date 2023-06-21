@@ -37,6 +37,7 @@ import com.example.dormitoryapp.viewmodel.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import okhttp3.internal.notify
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -197,6 +198,11 @@ class HomeFragment : Fragment() {
                 DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm")
                     .format(LocalDateTime.parse(postModel.publishDate))
             }"
+
+            tvExpireDate.text = "Потеряет актуальность: ${
+                DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm")
+                    .format(LocalDateTime.parse(postModel.expireDate))
+            }"
             tvTitle.text = postModel.title
             tvAuthor.text = "${postModel.firstName} ${postModel.surname} "
             tvAuthor.setOnClickListener {
@@ -337,7 +343,12 @@ class HomeFragment : Fragment() {
                 }
             })
         }
+        for (thread in list){
+            thread.notify()
+        }
     }
+
+    var list = ArrayList<Thread>()
 
 
     private fun filterList() {
@@ -361,6 +372,4 @@ class HomeFragment : Fragment() {
                 LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
     }
-
-
 }

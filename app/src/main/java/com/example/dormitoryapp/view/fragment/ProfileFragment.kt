@@ -326,7 +326,7 @@ class ProfileFragment : Fragment() {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         } else {
-            if (PrefsManager(requireContext()).getProfile().deviceId == "") {
+            if (PrefsManager(requireContext()).getProfile().deviceId == "" || PrefsManager(requireContext()).getProfile()== null) {
                 getFirebaseToken()
             }
         }

@@ -22,7 +22,6 @@ class NotificationViewModel(val app: Application) : AndroidViewModel(app) {
     fun sendNotifications(idUser: Int, idPost: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                isLoading.setValue(true)
                 val notifier = PrefsManager(app).getProfile()
                 val response =
                     DormitoryClient.retrofit.sendNotification(notifier.id, idUser, idPost)
