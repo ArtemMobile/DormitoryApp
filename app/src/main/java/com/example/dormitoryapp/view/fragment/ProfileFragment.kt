@@ -33,6 +33,7 @@ import com.example.dormitoryapp.viewmodel.ProfileViewModel
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 
+
 class ProfileFragment : Fragment() {
 
     private val binding: FragmentProfileBinding by lazy {
@@ -141,9 +142,18 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        viewModel.isWaiting.observe(viewLifecycleOwner){
-            binding.root.isRefreshing = it
-            binding.root.setColorSchemeResources(R.color.accent)
+        viewModel.isWaiting.observe(viewLifecycleOwner) {
+            binding.root.apply {
+                isRefreshing = it
+                setColorSchemeResources(R.color.white)
+                setProgressBackgroundColorSchemeColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.accent
+                    )
+                )
+            }
+
         }
 
         viewModel.profile.observe(viewLifecycleOwner) {
@@ -157,6 +167,8 @@ class ProfileFragment : Fragment() {
 
     private fun setData(profile: ProfileModel) {
         with(binding) {
+            confidentialityLayout.visibility = View.GONE
+            textBlock.text = "Вы можете редактироваь информацию о с себе"
             etName.setText(profile.firstName)
             etRoom.setText(profile.room.toString())
             etInterests.setText(profile.interests)
@@ -215,6 +227,12 @@ class ProfileFragment : Fragment() {
                 selectPhotoLauncher.launch(Intent(Intent.ACTION_GET_CONTENT).apply {
                     type = "image/*"
                 })
+            }
+            tvPolicyOfOnfidentiality.setOnClickListener {
+                val url = "https://www.4shared.com/web/preview/pdf/7ghfLJdZjq?"
+                val i = Intent(Intent.ACTION_VIEW)
+                i.data = Uri.parse(url)
+                startActivity(i)
             }
         }
     }

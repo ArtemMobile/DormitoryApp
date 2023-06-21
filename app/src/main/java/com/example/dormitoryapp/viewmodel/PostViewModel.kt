@@ -20,8 +20,10 @@ class PostViewModel : ViewModel() {
     val isLoading = MutableLiveData<Boolean>()
     val createPostResponse = MutableLiveData<ResponseModel>()
     val updatePostResponse = MutableLiveData<ResponseModel>()
+    val deletePostResponse = MutableLiveData<ResponseModel>()
     val createPostStatus = MutableLiveData<CreatePostStatus>()
     val updatePostStatus = MutableLiveData<CreatePostStatus>()
+    val deletePostStatus = MutableLiveData<CreatePostStatus>()
     fun getPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -98,7 +100,10 @@ class PostViewModel : ViewModel() {
                         Log.d("updatedPost", createPostModel.toString())
                         isLoading.value = false
                     } else {
-                        updatePostResponse.value = Gson().fromJson(response.errorBody()?.string(), ResponseModel::class.java)
+                        updatePostResponse.value = Gson().fromJson(
+                            response.errorBody()?.string(),
+                            ResponseModel::class.java
+                        )
                         updatePostStatus.value = CreatePostStatus.FAILURE
                         Log.d("updatePostFailure", response.errorBody()?.string().toString())
                     }
@@ -110,12 +115,37 @@ class PostViewModel : ViewModel() {
         }
     }
 
+    fun deletePost(idPost: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                isLoading.postValue(true)
+                val response = DormitoryClient.retrofit.deletePost(idPost)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        deletePostStatus.value = CreatePostStatus.SUCCESS
+                        deletePostResponse.value = response.body()
+                    } else {
+                        deletePostStatus.value = CreatePostStatus.FAILURE
+                        deletePostResponse.value = response.body()
+                    }
+                }
+
+            } catch (e: java.lang.Exception) {
+                e.localizedMessage?.let { Log.d("deletePostException", it) }
+            }
+        }
+    }
+
     fun clearCreatePostStatus() {
         createPostStatus.value = CreatePostStatus.NOTHING
     }
 
     fun clearUpdatePostStatus() {
         updatePostStatus.value = CreatePostStatus.NOTHING
+    }
+
+    fun clearDeletePostStatus(){
+        deletePostStatus.value = CreatePostStatus.NOTHING
     }
 
 }

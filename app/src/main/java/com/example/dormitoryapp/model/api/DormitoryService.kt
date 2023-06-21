@@ -55,6 +55,9 @@ interface DormitoryService {
         @Query("id") id: Int
     ): Response<ResponseModel>
 
+    @DELETE("Post/{id}")
+    suspend fun deletePost(@Path("id") id: Int): Response<ResponseModel>
+
     @GET("PostSubscription/{idProfile}")
     suspend fun getPostSubscriptionsByProfile(@Path("idProfile") idProfile: Int): Response<List<PostSubscriptionModel>>
 

@@ -158,7 +158,7 @@ class CreatePostFragment : Fragment() {
                     )
                 }
             }
-            etExpireDate.setText(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(expireDate))
+            etExpireDate.text = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(expireDate)
             cbPayable.isChecked = postModel.isPayable
             etTitle.setText(postModel.title)
             chipGroup.check(postModel.idType)
@@ -183,8 +183,6 @@ class CreatePostFragment : Fragment() {
         val negBtn = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
         negBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent))
         negBtn.isAllCaps = false
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -206,6 +204,10 @@ class CreatePostFragment : Fragment() {
 
             etNotificationDate.setOnClickListener {
                 showNotificationTimePicker()
+            }
+
+            btnDeletePost.setOnClickListener {
+                post?.id?.let { id -> viewModel.deletePost(id) }
             }
 
             btnCreatePost.setOnClickListener {
@@ -286,6 +288,25 @@ class CreatePostFragment : Fragment() {
                 CreatePostStatus.SUCCESS -> {
                     findNavController().popBackStack()
                     viewModel.clearUpdatePostStatus()
+                }
+                CreatePostStatus.FAILURE -> {
+
+                }
+                CreatePostStatus.NOTHING -> {
+
+                }
+            }
+        }
+
+        viewModel.deletePostResponse.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.value.message, Toast.LENGTH_SHORT).show()
+        }
+
+        viewModel.deletePostStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                CreatePostStatus.SUCCESS -> {
+                    findNavController().popBackStack()
+                    viewModel.clearDeletePostStatus()
                 }
                 CreatePostStatus.FAILURE -> {
 

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.view.isEmpty
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doOnTextChanged
@@ -153,7 +154,16 @@ class HomeFragment : Fragment() {
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
-            binding.root.isRefreshing = it
+            binding.root.apply {
+                isRefreshing = it
+                setColorSchemeResources(R.color.white)
+                setProgressBackgroundColorSchemeColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.accent
+                    )
+                )
+            }
         }
 
         postSubscriptionViewModel.postSubscriptionOfUser.observe(viewLifecycleOwner) {
