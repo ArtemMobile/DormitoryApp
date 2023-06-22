@@ -18,12 +18,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/ivClose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
 
-                android:src="@drawable/back_button" />
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -37,6 +32,13 @@
                 android:text="Клинический анализ крови с лейкоцитарной формулой"
                 android:textColor="@color/black"
                 android:textSize="22sp" />
+
+
+            <ImageView
+                android:id="@+id/ivClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cross" />
 
 
         </LinearLayout>

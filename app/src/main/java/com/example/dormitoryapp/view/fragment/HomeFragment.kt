@@ -183,9 +183,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-        viewModel.postById.observe(viewLifecycleOwner){
-            showBottomSheetDialog(it)
-        }
 
         postSubscriptionViewModel.postSubscriptionOfUser.observe(viewLifecycleOwner) {
             postSubscriptionsOfUser = it

@@ -56,7 +56,7 @@ class ProfileFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            if (PrefsManager(requireContext()).getProfile().deviceId == "") {
+            if (PrefsManager(requireContext()).getProfile().deviceId == "" || PrefsManager(requireContext()).getProfile().deviceId == null ) {
                 getFirebaseToken()
             }
             Toast.makeText(requireContext(), "Разрешение получено", Toast.LENGTH_SHORT)
@@ -71,7 +71,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private var deviceId = ""
+    private var deviceId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,6 +90,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         applyEditors()
         applyClicks()
+        deviceId = PrefsManager(requireContext()).getProfile().deviceId
         setObservers()
         askNotificationPermission()
         viewModel.getProfileId()
@@ -199,7 +200,7 @@ class ProfileFragment : Fragment() {
                             etSurname.text.toString(),
                             PrefsManager(requireContext()).getEmail(),
                             viewModel.profileId.value!!,
-                            deviceId,
+                            if(deviceId==null) "" else deviceId!!,
                             true
                         ), viewModel.profileId.value!!
                     )
@@ -216,7 +217,7 @@ class ProfileFragment : Fragment() {
                             etSurname.text.toString(),
                             PrefsManager(requireContext()).getEmail(),
                             0,
-                            deviceId,
+                            if(deviceId==null) "" else deviceId!!,
                             true
                         )
                     )
@@ -326,7 +327,7 @@ class ProfileFragment : Fragment() {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         } else {
-            if (PrefsManager(requireContext()).getProfile().deviceId == "" || PrefsManager(requireContext()).getProfile()== null) {
+            if (PrefsManager(requireContext()).getProfile().deviceId == "" ||PrefsManager(requireContext()).getProfile().deviceId == null) {
                 getFirebaseToken()
             }
         }

@@ -18,25 +18,24 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="44dp"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="@font/sf_pro_semi"
-                android:text="Клинический анализ крови с лейкоцитарной формулой"
-                android:textColor="@color/black"
-                android:textSize="22sp" />
-
             <ImageView
                 android:id="@+id/ivClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:src="@drawable/ic_cross" />
+                android:src="@drawable/back_button" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/sf_pro_semi"
+            android:text="Клинический анализ крови с лейкоцитарной формулой"
+            android:textColor="@color/black"
+            android:textSize="22sp" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
