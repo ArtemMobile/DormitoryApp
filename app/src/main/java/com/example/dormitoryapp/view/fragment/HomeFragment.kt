@@ -3,6 +3,7 @@ package com.example.dormitoryapp.view.fragment
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.BroadcastReceiver
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -47,6 +48,8 @@ class HomeFragment : Fragment() {
         FragmentHomeBinding.inflate(layoutInflater)
     }
 
+    private lateinit var pushBroadcastReceiver: BroadcastReceiver
+
     private val postTypeViewModel: PostTypeViewModel by viewModels()
     private val viewModel: PostViewModel by viewModels()
     private val postSubscriptionViewModel: PostSubscriptionViewModel by viewModels()
@@ -80,6 +83,10 @@ class HomeFragment : Fragment() {
         applyClicks()
         initNewsRecycler()
 
+        var post = arguments?.getSerializable("postToWatch") as? PostModel
+        post?.let { showBottomSheetDialog(it) }
+        viewModel.clearPostByIdStatus()
+
         binding.etSearch.doOnTextChanged { text, start, before, count ->
             if (text!!.isNotBlank()) {
                 posts = posts?.filter {
@@ -110,6 +117,14 @@ class HomeFragment : Fragment() {
                 viewModel.getPosts()
             }
         }
+
+
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //requireContext().unregisterReceiver(pushBroadcastReceiver)
     }
 
     private fun applyClicks() {
@@ -125,6 +140,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setObservers() {
         val dialog = ProgressDialog(requireContext())
         dialog.setCancelable(false)
@@ -165,6 +181,10 @@ class HomeFragment : Fragment() {
                     )
                 )
             }
+        }
+
+        viewModel.postById.observe(viewLifecycleOwner){
+            showBottomSheetDialog(it)
         }
 
         postSubscriptionViewModel.postSubscriptionOfUser.observe(viewLifecycleOwner) {
@@ -261,7 +281,7 @@ class HomeFragment : Fragment() {
             }
 
             btnSubscribe.apply {
-                if (postSubscriptionsOfUser!!.contains(postSubscriptionsOfUser?.firstOrNull { it.idPost == postModel.id })) {
+                if (postSubscriptionsOfUser?.let { it.contains((postSubscriptionsOfUser?.firstOrNull { it.idPost == postModel.id })) } == true) {
                     text = "Отписаться от уведомления"
                     setOnClickListener {
                         postSubscriptionViewModel.deletePostSubscription(postModel.id)
@@ -294,6 +314,7 @@ class HomeFragment : Fragment() {
             }
         }
         bottomSheetDialog.show()
+        viewModel.postById.value = null
     }
 
     private fun showNewsDialog(newsModel: NewsModel) {
@@ -343,7 +364,7 @@ class HomeFragment : Fragment() {
                 }
             })
         }
-        for (thread in list){
+        for (thread in list) {
             thread.notify()
         }
     }

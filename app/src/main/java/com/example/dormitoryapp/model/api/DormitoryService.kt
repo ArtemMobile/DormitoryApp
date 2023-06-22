@@ -28,6 +28,9 @@ interface DormitoryService {
     @GET("Post")
     suspend fun getPostsData(@Header("Connection") connection: String = "close"): Response<List<PostModel>>
 
+    @GET("Post/{id}")
+    suspend fun getPostById(@Path("id") id: Int): Response<PostModel>
+
     @GET("Post/byType")
     suspend fun getPostsByType(
         @Query("idType") idType: Int,

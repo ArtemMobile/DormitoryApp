@@ -16,6 +16,7 @@ import kotlinx.coroutines.withContext
 
 class PostViewModel : ViewModel() {
     val posts = MutableLiveData<List<PostModel>>()
+    val postById = MutableLiveData<PostModel>()
     val error = MutableLiveData<String>()
     val isLoading = MutableLiveData<Boolean>()
     val createPostResponse = MutableLiveData<ResponseModel>()
@@ -24,6 +25,7 @@ class PostViewModel : ViewModel() {
     val createPostStatus = MutableLiveData<CreatePostStatus>()
     val updatePostStatus = MutableLiveData<CreatePostStatus>()
     val deletePostStatus = MutableLiveData<CreatePostStatus>()
+    val postByIdStatus = MutableLiveData<CreatePostStatus>()
     fun getPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -39,6 +41,26 @@ class PostViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 //error.postValue(e.localizedMessage)
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getPostById(id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                isLoading.postValue(true)
+                val response = DormitoryClient.retrofit.getPostById(id)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        postByIdStatus.value = CreatePostStatus.SUCCESS
+                        postById.value = response.body()!!
+                        isLoading.postValue(false)
+                    } else {
+                        Log.d("getPostsError", response.errorBody()?.string().toString())
+                    }
+                }
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
@@ -148,4 +170,7 @@ class PostViewModel : ViewModel() {
         deletePostStatus.value = CreatePostStatus.NOTHING
     }
 
+    fun clearPostByIdStatus(){
+        postByIdStatus.value = CreatePostStatus.NOTHING
+    }
 }

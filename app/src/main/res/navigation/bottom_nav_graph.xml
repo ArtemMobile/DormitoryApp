@@ -65,4 +65,16 @@
         android:name="com.example.dormitoryapp.view.fragment.CreatePostFragment"
         android:label="fragment_create_post"
         tools:layout="@layout/fragment_create_post" />
+    <fragment
+        android:id="@+id/postFragment"
+        android:name="com.example.dormitoryapp.view.fragment.PostFragment"
+        android:label="PostFragment" >
+        <action
+            android:id="@+id/action_postFragment_to_userFragment"
+            app:destination="@id/userFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 </navigation>
