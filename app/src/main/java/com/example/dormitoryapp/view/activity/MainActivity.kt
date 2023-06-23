@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, des, _ ->
             when (des.id) {
                 R.id.userFragment -> hideBottomNav()
+                R.id.postFragment -> hideBottomNav()
                 R.id.homeFragment -> {
                     viewModel.clearPostByIdStatus()
                 }

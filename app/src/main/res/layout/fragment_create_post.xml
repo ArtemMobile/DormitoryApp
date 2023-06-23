@@ -154,7 +154,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="12dp"
                 android:buttonTint="@color/accent"
-                android:text="Поставьте галочку, если запись касается купли-продажи или если вы готовы материально отблагодарить за помощь"
+                android:text="Поставьте галочку, если запись касается купли, продажи или обмена или если вы готовы материально отблагодарить за помощь"
                 android:textSize="11sp" />
 
         </LinearLayout>
@@ -170,7 +170,7 @@
             android:layout_weight="1"
             android:enabled="false"
             android:letterSpacing="0"
-            android:text="Сохранить"
+            android:text="Создать запись"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="17sp"

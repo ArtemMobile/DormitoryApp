@@ -33,6 +33,20 @@ class FeedbackFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setObservers()
         applyClicks()
+        binding.textView5.setOnLongClickListener {
+            with(binding) {
+                etAuthor.setText("Анонимный студент")
+                etComment.setText("Спасибо большое за ваш сервис. Он очень помог мне в преодолении соцальной неловкости")
+            }
+            true
+        }
+
+        binding.textView5.setOnClickListener {
+            with(binding) {
+                etAuthor.setText("Анонимный студент")
+                etComment.setText("Спасибо большое за ваш сервис. Он очень помог мне в преодолении соцальной неловкости")
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -46,32 +60,38 @@ class FeedbackFragment : Fragment() {
         val dialog = ProgressDialog(requireContext())
         dialog.setCancelable(false)
         dialog.setMessage("Ждём-ждём")
-        viewModel.status.observe(viewLifecycleOwner){
-            when(it){
+        viewModel.status.observe(viewLifecycleOwner) {
+            when (it) {
                 FeedbackStatus.SUCCESS -> {
-                    with(binding){
+                    with(binding) {
                         etAuthor.setText("")
                         etComment.setText("")
                         etComment.clearFocus()
                         etAuthor.clearFocus()
                     }
-                    Toast.makeText(requireContext(), viewModel.feedbackResponse.value?.value?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        viewModel.feedbackResponse.value?.value?.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 FeedbackStatus.FAIL -> {
 
                 }
+
                 FeedbackStatus.NOTHING -> {
 
                 }
             }
         }
 
-        viewModel.isLoading.observe(viewLifecycleOwner){
-           if(it){
-               dialog.show()
-           } else{
-               dialog.dismiss()
-           }
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            if (it) {
+                dialog.show()
+            } else {
+                dialog.dismiss()
+            }
         }
     }
 

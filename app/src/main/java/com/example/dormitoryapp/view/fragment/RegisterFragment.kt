@@ -39,6 +39,9 @@ class RegisterFragment : Fragment() {
         applyClicks()
         applyButtonNext()
         setObservers()
+        binding.linearLayout2.setOnClickListener {
+            binding.etTelegramNick.setText("ivanivanov31922@gmail.com")
+        }
     }
 
     private fun applyClicks() {

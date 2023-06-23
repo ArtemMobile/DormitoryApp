@@ -8,6 +8,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.view.isEmpty
 import androidx.core.widget.NestedScrollView
+import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -87,19 +90,30 @@ class HomeFragment : Fragment() {
         post?.let { showBottomSheetDialog(it) }
         viewModel.clearPostByIdStatus()
 
-        binding.etSearch.doOnTextChanged { text, start, before, count ->
-            if (text!!.isNotBlank()) {
-                posts = posts?.filter {
-                    it.name.lowercase().contains(
-                        binding.etSearch.text.toString().lowercase()
-                    ) || it.description.lowercase()
-                        .contains(binding.etSearch.text.toString().lowercase())
-                }
-                posts?.let { postAdapter.updatePosts(it) }
-            } else {
-                viewModel.getPosts()
+        binding.etSearch.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
             }
-        }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if(binding.etSearch.text.toString().isNotEmpty()){
+                    posts = posts?.filter {
+                        it.title.lowercase().contains(
+                            binding.etSearch.text.toString()
+                        )
+                    }
+                    posts?.let { postAdapter.updatePosts(it) }
+                } else{
+                    viewModel.getPosts()
+                }
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
 
         with(binding.chipGroup) {
             setOnCheckedStateChangeListener { _, checkedIds ->
@@ -361,13 +375,7 @@ class HomeFragment : Fragment() {
                 }
             })
         }
-        for (thread in list) {
-            thread.notify()
-        }
     }
-
-    var list = ArrayList<Thread>()
-
 
     private fun filterList() {
         val type = binding.chipGroup.checkedChipId

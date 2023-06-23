@@ -139,6 +139,21 @@ class CreatePostFragment : Fragment() {
         if (post != null) {
             setData(post!!)
         }
+
+        binding.tvCreatePost.setOnLongClickListener {
+            with(binding){
+                etTitle.setText("Отдам 5 пачек чая")
+                etDescription.setText("Обменяю 5 пачек чая на 10 пачек сахара! Привёз из дома очень много чая, но сахара совсем нет. Кому нужен чай - пишите.")
+            }
+            true
+        }
+
+        binding.tvCreatePost.setOnClickListener {
+            with(binding){
+                etTitle.setText("Отдам 5 пачек чая")
+                etDescription.setText("Обменяю 5 пачек чая на 10 пачек сахара! Привёз из дома очень много чая, но сахара совсем нет. Кому нужен чай - пишите.")
+            }
+        }
     }
 
 

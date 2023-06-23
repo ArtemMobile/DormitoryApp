@@ -95,6 +95,20 @@ class ProfileFragment : Fragment() {
         askNotificationPermission()
         viewModel.getProfileId()
         binding.root.isEnabled = false
+
+        binding.textBlock.setOnClickListener {
+            binding.etName.setText("Артемий")
+        }
+
+        binding.tvHeader.setOnClickListener {
+            binding.etName.setText("Артём")
+            binding.etSurname.setText("Сематкин")
+            binding.etPatronymic.setText("Владиславович")
+            binding.etRoom.setText("420")
+            binding.etGroupNumber.setText("420")
+            binding.etContactInfo.setText("telegram: justme19artem")
+            binding.etInterests.setText("фильмы Гая Ричи, программирование, путешествия")
+        }
     }
 
     private fun setObservers() {
@@ -133,8 +147,6 @@ class ProfileFragment : Fragment() {
             }
         }
 
-
-        //nahera?
         viewModel.isLoading.observe(viewLifecycleOwner) {
             if (it) {
                 dialog.show()
@@ -230,7 +242,7 @@ class ProfileFragment : Fragment() {
                 })
             }
             tvPolicyOfOnfidentiality.setOnClickListener {
-                val url = "https://www.4shared.com/web/preview/pdf/7ghfLJdZjq?"
+                val url = "https://www.4shared.com/web/preview/pdf/GAi-ZwFMge?"
                 val i = Intent(Intent.ACTION_VIEW)
                 i.data = Uri.parse(url)
                 startActivity(i)
