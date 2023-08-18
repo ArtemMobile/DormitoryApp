@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "1050483629740",
-    "project_id": "dormitoryimages",
-    "storage_bucket": "dormitoryimages.appspot.com"
+    "project_number": "981967393581",
+    "project_id": "dormitorynotifications",
+    "storage_bucket": "dormitorynotifications.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1050483629740:android:f6165bcded4d733cf4c909",
+        "mobilesdk_app_id": "1:981967393581:android:1b515c42de5c6a7ea579a4",
         "android_client_info": {
           "package_name": "com.example.dormitoryapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "981967393581-gh452u2cgt47fqrik19e44hmbvbf7oem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyBHtVXnT4lhkTumYlowncsfGEanSx512ro"
+          "current_key": "AIzaSyBcc2a4jDz2CmDOruLPJ2nRX-haYBjr8XQ"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981967393581-gh452u2cgt47fqrik19e44hmbvbf7oem.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

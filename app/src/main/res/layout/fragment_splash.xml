@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2596be"
+    android:background="@color/accent_bright"
     tools:context=".view.fragment.SplashFragment">
 
     <ImageView
@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:alpha="0"
         android:layout_gravity="center"
-        android:src="@drawable/splash_logo"
+        android:src="@drawable/og"
         android:layout_height="wrap_content"/>
 
 </FrameLayout>

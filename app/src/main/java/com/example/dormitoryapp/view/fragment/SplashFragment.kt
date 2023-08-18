@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.dormitoryapp.R
 import com.example.dormitoryapp.databinding.FragmentSplashBinding
+import com.example.dormitoryapp.utils.PrefsManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -30,10 +31,26 @@ class SplashFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
             ivLogo.animate()
-                .alpha(1f).duration = 1500
+                .alpha(1f)
+                .duration = 1700
             lifecycleScope.launch {
-                delay(1500)
-                findNavController().navigate(R.id.action_splashFragment_to_onboardingFragment)
+                delay(2000)
+                val prefsManager = PrefsManager(requireContext())
+                if (prefsManager.getOnboardingPassed()) {
+                    if (prefsManager.getLoginPassed()) {
+                        if (prefsManager.getCreateProfilePassed()) {
+                            findNavController().navigate(R.id.action_splashFragment_to_mainActivity)
+                            requireActivity().finish()
+                        } else {
+                            findNavController().navigate(R.id.action_splashFragment_to_profileFragment)
+                        }
+
+                    } else {
+                        findNavController().navigate(R.id.action_splashFragment_to_registerFragment)
+                    }
+                } else {
+                    findNavController().navigate(R.id.action_splashFragment_to_onboardingFragment)
+                }
             }
         }
     }

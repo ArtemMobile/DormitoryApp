@@ -2,4 +2,13 @@
     <string name="app_name">Общежитие</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="skip">Завершить</string>
+    <string name="hello">Добро пожаловать!</string>
+    <string name="login_text">Войдите, чтобы пользоваться функциями\nприложения</string>
+    <string name="telegram_nick_hint" formatted="false">example@mail.ru</string>
+    <string name="next">Далее</string>
+    <string name="enter_by_what">Вход через электронную почту</string>
+    <string name="feedback_template">Ваше мнение очень важно для нас!\nВы можете помочь нам в улучшении\nкачества работы сервиса, оставив свой отзыв.</string>
+    <string name="waiting">Подождите, данные подгружаются</string>
+    <string name="waiting_to_create">Подождите</string>
 </resources>
